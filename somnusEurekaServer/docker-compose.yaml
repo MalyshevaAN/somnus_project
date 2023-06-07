@@ -1,0 +1,52 @@
+version: '3'
+services:
+
+  user-db:
+    image: "postgres:13.3"
+    environment:
+      POSTGRES_DB: "somnus-user"
+      POSTGRES_USER: "Nastia"
+      POSTGRES_PASSWORD: "qwerty"
+    ports:
+      - 7432:5432
+
+
+  eureka-server:
+    image: somnus-eureka-server:latest
+    ports:
+      - 8761:8761
+    restart: always
+    networks:
+      - spring-cloud-network
+    environment:
+      eureka.instance.hostname: eureka-server
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
+  user-auth-server:
+    image: auth-user-server:latest
+    ports:
+      - 8081:8081
+    networks:
+      - spring-cloud-network
+    depends_on:
+      - user-db
+      - eureka-server
+    environment:
+      server.port: 8081
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
+  dream-server:
+    image: dream-server:latest
+    ports:
+      - 8082:8082
+    networks:
+      - spring-cloud-network
+    depends_on:
+      - eureka-server
+    environment:
+      server.port: 8082
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
+networks:
+  spring-cloud-network:
+    driver: bridge
