@@ -7,7 +7,6 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class SomnusDreamCommentApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(SomnusDreamCommentApplication.class, args);
 	}

@@ -5,5 +5,5 @@ from lexicon.lexicon_ru import LEXICON
 router: Router = Router()
 
 @router.message()
-async def send_mistake_message(message: Message):
-    await message.answer(LEXICON['mistake'])
+async def check(message: Message):
+    await message.answer(text="Не понимаю тебя :(\nВоспользуйся командой /help, чтобы посмотреть, какие возможности есть у бота")

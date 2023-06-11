@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import nastia.somnusAuth.authorization.config.ApplicationConfig;
 import nastia.somnusAuth.authorization.domain.User;
 import nastia.somnusAuth.authorization.domain.UserInView;
+import nastia.somnusAuth.authorization.domain.UserInViewTG;
 import nastia.somnusAuth.authorization.domain.UserOutView;
 import nastia.somnusAuth.authorization.exception.*;
 import nastia.somnusAuth.authorization.repository.UserRepository;
@@ -18,47 +19,49 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserServiceInterface{
+public class UserService implements UserServiceInterface {
 
     @Autowired
     UserRepository userRepository;
     @Autowired
     ApplicationConfig applicationConfig;
 
-//    @Autowired
+    //    @Autowired
 //    private final AvatarServiceConfig avatarService;
     @Autowired
     AvatarService avatarService;
 
 
-//    public UserService(ApplicationConfig applicationConfig, UserRepository userRepository) {
-//        this.applicationConfig = applicationConfig;
-//        this.userRepository = userRepository;
-//    }
-
-    public Optional<User> getByEmail(@NonNull String email) {
-        return userRepository.findAll().stream()
-                .filter(user -> email.equals(user.getEmail()))
-                .findFirst();
+    public UserOutView getByEmailTG(@NonNull UserInViewTG userInViewTG) throws UserIsNotFoundException {
+        if (userRepository.existsByEmail(userInViewTG.getUserEmail())) {
+            return createUserOutView(userRepository.findByEmail(userInViewTG.getUserEmail()));
+        }
+        throw new UserIsNotFoundException();
     }
 
+
+    public Optional<User> getByEmail(@NonNull String email) {
+        return Optional.ofNullable(userRepository.findByEmail(email));
+    }
+
+
     public UserOutView addUser(UserInView userIn) throws UserAlreadyExists, PasswordDifferException {
-        if (userRepository.existsByEmail(userIn.getEmail())){
+        if (userRepository.existsByEmail(userIn.getEmail())) {
             throw new UserAlreadyExists();
         }
 
-        if (!Objects.equals(userIn.getPassword(), userIn.getPasswordConfirm())){
+        if (!Objects.equals(userIn.getPassword(), userIn.getPasswordConfirm())) {
             throw new PasswordDifferException();
         }
         User newUser = createUserOfUserInView(userIn);
         return createUserOutView(userRepository.save(newUser));
     }
 
-    public Optional<User> getUserById(long id){
+    public Optional<User> getUserById(long id) {
         return userRepository.findById(id);
     }
 
-    public Optional<UserOutView> saveFollow(long clientId, long userId){
+    public Optional<UserOutView> saveFollow(long clientId, long userId) {
         if (clientId != userId) {
             Optional<User> client = userRepository.findById(clientId);
             Optional<User> subscription = userRepository.findById(userId);
@@ -72,8 +75,9 @@ public class UserService implements UserServiceInterface{
         }
         return Optional.empty();
     }
-    public Optional<UserOutView> deleteFollow(long clientId, long userId){
-        if(clientId != userId){
+
+    public Optional<UserOutView> deleteFollow(long clientId, long userId) {
+        if (clientId != userId) {
             Optional<User> client = userRepository.findById(clientId);
             Optional<User> subscription = userRepository.findById(userId);
 
@@ -87,18 +91,19 @@ public class UserService implements UserServiceInterface{
         return Optional.empty();
     }
 
-    public Set<UserOutView> getSubscriptions(long userId){
+    public Set<UserOutView> getSubscriptions(long userId) {
         Set<User> mySubscriptions = userRepository.findById(userId).get().getSubscribtions();
         return UserOutSet(mySubscriptions);
     }
-    public Set<UserOutView> getSubscribers(long userId){
+
+    public Set<UserOutView> getSubscribers(long userId) {
         Set<User> mySubscribers = userRepository.findById(userId).get().getSubscribers();
         return UserOutSet(mySubscribers);
     }
 
     public UserOutView addAvatar(MultipartFile file, long userId) throws UserIsNotFoundException, UserHasNoAvatarException, UploadException {
         Optional<User> user = getUserById(userId);
-        if (user.isPresent()){
+        if (user.isPresent()) {
             User userWithAva = user.get();
             Long avatarId = avatarService.uploadAvatar(file, userId);
             userWithAva.setAvatarId(avatarId);
@@ -119,13 +124,13 @@ public class UserService implements UserServiceInterface{
         newUser.setLastName(user.getLastName());
         try {
             newUser.setAvatarPath(avatarService.downloadAvatar(user.getId()));
-        }catch (UserHasNoAvatarException e){
+        } catch (UserHasNoAvatarException e) {
             return newUser;
         }
         return newUser;
     }
 
-    private User createUserOfUserInView(UserInView userInView){
+    private User createUserOfUserInView(UserInView userInView) {
         User user = new User();
         user.setEmail(userInView.getEmail());
         user.setPassword(applicationConfig.HashPassword(userInView.getPassword()));
@@ -133,7 +138,8 @@ public class UserService implements UserServiceInterface{
         user.setLastName(userInView.getLastName());
         return user;
     }
-    private Set<UserOutView> UserOutSet(Set<User> users){
+
+    private Set<UserOutView> UserOutSet(Set<User> users) {
         return users.stream().map(this::createUserOutView).collect(Collectors.toSet());
     }
 }

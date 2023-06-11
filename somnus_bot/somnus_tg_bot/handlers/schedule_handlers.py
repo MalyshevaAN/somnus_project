@@ -24,7 +24,7 @@ async def send_good_morning():
 
 
 async def scheduler():
-    aioschedule.every().day.at('00:25').do(send_good_morning)
+    aioschedule.every().day.at('07:00').do(send_good_morning)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(1)

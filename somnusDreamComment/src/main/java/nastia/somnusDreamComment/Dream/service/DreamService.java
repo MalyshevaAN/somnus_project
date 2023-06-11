@@ -6,6 +6,7 @@ import nastia.somnusDreamComment.Dream.exception.UserHaveNoRights;
 import nastia.somnusDreamComment.Dream.exception.DreamNotFoundException;
 import nastia.somnusDreamComment.Dream.model.Dream;
 import nastia.somnusDreamComment.Dream.model.DreamInView;
+import nastia.somnusDreamComment.Dream.model.DreamInViewTg;
 import nastia.somnusDreamComment.Dream.model.DreamOutView;
 import nastia.somnusDreamComment.Dream.repository.DreamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,12 @@ public class DreamService implements DreamServiceInterface {
 
     public Optional<DreamOutView> addDream(DreamInView dreamInView, Long authorId){
         Dream newDream = new Dream(dreamInView.getDreamText(), authorId);
+        return Optional.of(createDreamOutView(dreamRepository.save(newDream)));
+    }
+
+    @Override
+    public Optional<DreamOutView> addDreamTg(DreamInViewTg dreamInViewTg) {
+        Dream newDream = new Dream(dreamInViewTg.getText(), dreamInViewTg.getAuthorId());
         return Optional.of(createDreamOutView(dreamRepository.save(newDream)));
     }
 

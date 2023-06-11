@@ -7,6 +7,7 @@ import nastia.somnusDreamComment.Dream.exception.DreamNotFoundException;
 import nastia.somnusDreamComment.Dream.exception.UserHaveNoRights;
 import nastia.somnusDreamComment.Dream.model.Dream;
 import nastia.somnusDreamComment.Dream.model.DreamInView;
+import nastia.somnusDreamComment.Dream.model.DreamInViewTg;
 import nastia.somnusDreamComment.Dream.model.DreamOutView;
 
 import java.util.*;
@@ -19,6 +20,8 @@ public interface DreamServiceInterface {
 
     Optional<DreamOutView> addDream(DreamInView dreamInView, Long authorId);
 
+    Optional<DreamOutView> addDreamTg(DreamInViewTg dreamInViewTg);
+
     Optional<DreamOutView> updateDream(DreamInView dreamUpdate, Long authorId, long dreamId) throws DreamNotFoundException, UserHaveNoRights;
 
     void deleteDream(long dreamId, long userId) throws DreamNotFoundException, UserHaveNoRights;
@@ -29,4 +32,5 @@ public interface DreamServiceInterface {
     List<DreamOutView> getUserDreams(long authorId);
 
     Optional<DreamOutView> likeDream(long dreamId, long userId, boolean like) throws DreamNotExistsException;
+
 }

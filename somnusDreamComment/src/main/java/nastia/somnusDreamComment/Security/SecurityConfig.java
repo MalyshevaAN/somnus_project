@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers("all").permitAll()
+                                .requestMatchers("randomTG", "addTG").permitAll()
                                 .anyRequest().authenticated()
                                 .and().addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 ).csrf().disable().headers().frameOptions().disable().and().build();

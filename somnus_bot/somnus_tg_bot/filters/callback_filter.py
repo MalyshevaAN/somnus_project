@@ -1,22 +1,18 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery
+from aiogram.types import Message
 
-class IsYesCallbackData(BaseFilter):
-    async def __call__(self, callback: CallbackQuery) -> bool:
-        return isinstance(callback.data, str) and callback.data == 'yes'
+class IsTextMessage(BaseFilter):
+    async def __call__(self, message: Message):
+        print(message.text)
+        print(message.content_type)
+        contains_alpha = False
+        for elem in message.text.split(' '):
+            if elem.isalpha():
+                contains_alpha = True
+                break
 
-class IsNoCallbackData(BaseFilter):
-    async def __call__(self, callback: CallbackQuery) -> bool:
-        return isinstance(callback.data, str) and callback.data == 'no'
-
-class IsAddCallbackData(BaseFilter):
-    async def __call__(self, callback: CallbackQuery) -> bool:
-        return isinstance(callback.data, str) and callback.data == 'add_one_more'
-
-
-class IsNoMoreCallbackData(BaseFilter):
-    async def __call__(self, callback: CallbackQuery) -> bool:
-        return isinstance(callback.data, str) and callback.data == 'no_more_dreams'
+        return message.text is not None and not message.text.startswith('/') and not message.text.isdigit() and contains_alpha
 
 
 

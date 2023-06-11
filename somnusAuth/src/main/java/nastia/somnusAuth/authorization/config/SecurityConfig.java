@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authz -> authz
                                 .requestMatchers(toH2Console()).permitAll()
-                                .requestMatchers( "/auth/register", "/auth/login").permitAll()
+                                .requestMatchers( "/auth/register", "/auth/login", "/idByEmail").permitAll()
                                 .anyRequest().authenticated()
                                 .and()
                                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
