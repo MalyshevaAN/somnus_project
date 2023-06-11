@@ -27,7 +27,9 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests(
-                        authz -> authz.anyRequest().authenticated()
+                        authz -> authz
+                                .requestMatchers("all").permitAll()
+                                .anyRequest().authenticated()
                                 .and().addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 ).csrf().disable().headers().frameOptions().disable().and().build();
     }

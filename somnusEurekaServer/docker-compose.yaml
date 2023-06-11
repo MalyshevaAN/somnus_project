@@ -2,7 +2,8 @@ version: '3'
 services:
 
   user-db:
-    image: "postgres:13.3"
+    image: "postgres:13.3-alpine"
+    container_name: user-db
     environment:
       POSTGRES_DB: "somnus-user"
       POSTGRES_USER: "Nastia"
@@ -15,25 +16,25 @@ services:
     image: somnus-eureka-server:latest
     ports:
       - 8761:8761
-    restart: always
     networks:
       - spring-cloud-network
     environment:
       eureka.instance.hostname: eureka-server
       eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
 
-  user-auth-server:
-    image: auth-user-server:latest
+
+  gateway-server:
+    image: gateway-server:latest
     ports:
-      - 8081:8081
+      - 8080:8080
     networks:
       - spring-cloud-network
     depends_on:
-      - user-db
       - eureka-server
     environment:
-      server.port: 8081
+      server.port: 8080
       eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
 
   dream-server:
     image: dream-server:latest
