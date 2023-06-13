@@ -2,7 +2,7 @@ import requests, json
 import dotenv, os
 import http
 from requests.exceptions import ConnectionError
-from database.database import user_connected
+from services.db_service import get_user_somnus_id
 from lexicon.lexicon_ru import LEXICON_POSSIBLE_RESPONSE
 
 dotenv.load_dotenv('somnus_tg_bot/.env')
@@ -25,16 +25,19 @@ def get_random_dream() -> str|int:
 
 def add_my_dream(text: str, user_id:str) -> int:
     try:
-        user_somnus_id = user_connected[user_id]
-        data = {'text':text, 'authorId':user_somnus_id}
-        headers = {'content-type':'application/json'}
-        response = requests.post(URL_POST, data=json.dumps(data), headers=headers)
-        if (response.status_code == http.HTTPStatus.OK):
-            return LEXICON_POSSIBLE_RESPONSE['OK']
-        if (response.status_code == http.HTTPStatus.BAD_REQUEST):
-            return LEXICON_POSSIBLE_RESPONSE['BAD_REQUEST']
+        user_somnus_id = get_user_somnus_id(int(user_id))
+        if user_somnus_id > 0:
+            data = {'text':text, 'authorId':user_somnus_id}
+            headers = {'content-type':'application/json'}
+            response = requests.post(URL_POST, data=json.dumps(data), headers=headers)
+            if (response.status_code == http.HTTPStatus.OK):
+                return LEXICON_POSSIBLE_RESPONSE['OK']
+            if (response.status_code == http.HTTPStatus.BAD_REQUEST):
+                return LEXICON_POSSIBLE_RESPONSE['BAD_REQUEST']
+        else:
+            return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR']
 
     except ConnectionError as e:
-        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR']
+        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']
 
 

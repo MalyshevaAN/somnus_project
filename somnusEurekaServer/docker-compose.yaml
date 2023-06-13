@@ -1,15 +1,15 @@
 version: '3'
 services:
 
-  user-db:
-    image: "postgres:13.3-alpine"
-    container_name: user-db
-    environment:
-      POSTGRES_DB: "somnus-user"
-      POSTGRES_USER: "Nastia"
-      POSTGRES_PASSWORD: "qwerty"
-    ports:
-      - 7432:5432
+#  user-db:
+#    image: "postgres:13.3-alpine"
+#    container_name: user-db
+#    environment:
+#      POSTGRES_DB: "somnus-user"
+#      POSTGRES_USER: "Nastia"
+#      POSTGRES_PASSWORD: "qwerty"
+#    ports:
+#      - 7432:5432
 
 
   eureka-server:
@@ -23,17 +23,17 @@ services:
       eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
 
 
-  gateway-server:
-    image: gateway-server:latest
-    ports:
-      - 8080:8080
-    networks:
-      - spring-cloud-network
-    depends_on:
-      - eureka-server
-    environment:
-      server.port: 8080
-      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+#  gateway-server:
+#    image: gateway-server:latest
+#    ports:
+#      - 8080:8080
+#    networks:
+#      - spring-cloud-network
+#    depends_on:
+#      - eureka-server
+#    environment:
+#      server.port: 8080
+#      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
 
 
   dream-server:
@@ -46,6 +46,18 @@ services:
       - eureka-server
     environment:
       server.port: 8082
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
+  user-server:
+    image: user-server:latest
+    ports:
+      - 8081:8081
+    networks:
+      - spring-cloud-network
+    depends_on:
+      - eureka-server
+    environment:
+      server.port: 8081
       eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
 
 networks:

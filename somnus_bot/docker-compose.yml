@@ -1,0 +1,11 @@
+version: '3'
+services:
+  tg_db:
+    image: 'postgres:13.3-alpine'
+    environment:
+      POSTGRES_DB: "somnus-tg-user"
+      POSTGRES_USER: "Nastia"
+      POSTGRES_PASSWORD: "qwerty"
+    ports:
+      - 7433:5432
+

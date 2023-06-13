@@ -7,6 +7,8 @@ from handlers import other_handlers, user_handlers, schedule_handlers, connect_h
 from aiogram.fsm.storage.redis import RedisStorage, Redis
 from aiogram.fsm.storage.memory import MemoryStorage
 from keyboards.keyboard_commands import set_first_menu
+from psycopg2 import OperationalError
+from services.db_service import create_user_table
 
 
 logger = logging.getLogger(__name__)
@@ -18,6 +20,13 @@ async def main():
                '[%(asctime)s] - %(name)s - %(message)s')
 
     logger.info("Bot is started")
+
+    try:
+        create_user_table()
+
+    except OperationalError as e:
+        logger.error("Can not connect to the database")
+        raise OperationalError
 
     config:Config = load_config("/home/nastia/javaProjects/SomnusMicro/somnus_bot/somnus_tg_bot/.env")
 

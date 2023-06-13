@@ -4,9 +4,9 @@ from aiogram.filters import Command, Text, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
-from database.database import  user_connected
+from services.db_service import insert_new_user
 from keyboards.keyboard_utils import create_keyboard
-from lexicon.lexicon_ru import LEXICON, LEXICON_COMMANDS, LEXICON_COMMANDS_FIRST
+from lexicon.lexicon_ru import LEXICON, LEXICON_COMMANDS, LEXICON_COMMANDS_FIRST, LEXICON_POSSIBLE_RESPONSE
 from services.user_service import get_id_by_email
 from states.user_states import  FSMConnectAccounts
 from aiogram import Router
@@ -72,12 +72,15 @@ async def cancel_connection(callback: CallbackQuery, state: FSMContext):
 async def process_check_code(message: Message, state: FSMContext):
     info = await state.get_data()
     if (message.text.replace(' ', '') == info['code']):
-        await message.answer(LEXICON['accounts_are_connected'])
-        await state.set_state(FSMConnectAccounts.connected)
         user_info = await state.get_data()
-        user_connected[message.from_user.id] = user_info['id']
-        await state.update_data(code=None, id=None)
-        print(user_connected)
+        response_status = insert_new_user(int(message.from_user.id), user_info['id'])
+        if response_status == LEXICON_POSSIBLE_RESPONSE['OK']:
+            await message.answer(LEXICON['accounts_are_connected'])
+            await state.set_state(FSMConnectAccounts.connected)
+            await state.update_data(code=None, id=None)
+        elif response_status == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']:
+            await message.answer(LEXICON['something_wrong_with_somnus_tg_db'])
+            await state.clear()
     else:
         await message.answer(LEXICON['wrong_check_code'], reply_markup=create_keyboard('email_again', 'cancel_connection'))
         await state.set_state(FSMConnectAccounts.send_email)

@@ -4,8 +4,6 @@ from aiogram.types import Message
 
 class IsTextMessage(BaseFilter):
     async def __call__(self, message: Message):
-        print(message.text)
-        print(message.content_type)
         contains_alpha = False
         for elem in message.text.split(' '):
             if elem.isalpha():

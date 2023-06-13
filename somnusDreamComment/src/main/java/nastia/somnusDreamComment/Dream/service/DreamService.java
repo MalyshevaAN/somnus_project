@@ -82,7 +82,6 @@ public class DreamService implements DreamServiceInterface {
 
 
     public Optional<DreamOutView> getRandomDream(){
-        Random random = new SecureRandom();
         if (dreamRepository.count() == 0){
             return Optional.empty();
         }
@@ -92,10 +91,11 @@ public class DreamService implements DreamServiceInterface {
         }
         if (lastDream.isPresent()) {
             long lastId = lastDream.get().getId();
-            long randId = random.nextLong(lastId + 1);
+
+            long randId = (long) (Math.random()*lastId + 1);
             while (dreamRepository.findById(randId).isEmpty()) {
                 System.out.println(randId);
-                randId = random.nextLong(lastId);
+                randId = (long) (Math.random()*lastId + 1);
             }
             return Optional.of(createDreamOutView(dreamRepository.findById(randId).get()));
         }
