@@ -32,10 +32,10 @@ async def main():
 
 
     bot:Bot = Bot(config.tg_bot.token, parse_mode='HTML')
-    redis: Redis = Redis(host='localhost')
+    redis: Redis = Redis(host=config.redis.host)
     storage: RedisStorage = RedisStorage(redis=redis)
     storage2: MemoryStorage = MemoryStorage()
-    dp: Dispatcher = Dispatcher(storage=storage2)
+    dp: Dispatcher = Dispatcher(storage=storage)
 
     asyncio.create_task(scheduler())
     await set_first_menu(bot=bot)

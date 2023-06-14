@@ -12,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration
 @EnableWebSecurity
@@ -31,7 +30,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(
                         authz -> authz
-                                .requestMatchers(toH2Console()).permitAll()
+//                                .requestMatchers(toH2Console()).permitAll()
                                 .requestMatchers( "/auth/register", "/auth/login", "/idByEmail").permitAll()
                                 .anyRequest().authenticated()
                                 .and()

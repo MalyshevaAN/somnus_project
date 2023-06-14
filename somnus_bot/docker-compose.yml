@@ -1,11 +1,54 @@
 version: '3'
 services:
+
+  redis:
+    image: redis:alpine
+    command:
+      - redis-server
+    env_file:
+      - ./somnus_tg_bot/.env
+    restart: on-failure
+    ports:
+      - 6379:6379
+
+
   tg_db:
     image: 'postgres:13.3-alpine'
+    env_file:
+      - ./somnus_tg_bot/.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: on-failure
+    networks:
+      - tg_bot_db
     environment:
       POSTGRES_DB: "somnus-tg-user"
       POSTGRES_USER: "Nastia"
       POSTGRES_PASSWORD: "qwerty"
     ports:
       - 7433:5432
+    expose:
+      - 7433:5432
 
+  bot:
+    image: tg_bot:latest
+    command: sh -c "python somnus_tg_bot/bot.py"
+    env_file:
+      - ./somnus_tg_bot/.env
+
+    networks:
+      - tg_bot_db
+    environment:
+      DB_HOST: tg_db
+      DB_PORT: 5432
+    restart: always
+    depends_on:
+      - tg_db
+      - redis
+
+volumes:
+  pgdata:
+
+networks:
+  tg_bot_db:
+    driver: bridge

@@ -1,0 +1,169 @@
+version: '3'
+services:
+
+  userDB:
+    image: "postgres:13.3-alpine"
+    volumes:
+      - pgdata:/var/lib/postgresql/data1
+    environment:
+      POSTGRES_DB: somnusUser
+      POSTGRES_USER: Nastia
+      POSTGRES_PASSWORD: qwerty
+    networks:
+      - spring-cloud-network
+    ports:
+      - 7432:5432
+    expose:
+      - 7432:5432
+
+  dreamDB:
+    image: "postgres:13.3-alpine"
+    volumes:
+      - pgdata:/var/lib/postgresql/data2
+    environment:
+      POSTGRES_DB: somnusDreams
+      POSTGRES_USER: Nastia
+      POSTGRES_PASSWORD: qwerty
+    networks:
+      - spring-cloud-network
+    ports:
+      - 7434:5432
+    expose:
+      - 7434:5432
+
+
+  eureka-server:
+    image: somnus-eureka-server:latest
+    ports:
+      - 8761:8761
+    expose:
+      - 8761:8761
+    networks:
+      - spring-cloud-network
+    environment:
+      eureka.instance.hostname: eureka-server
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
+
+#  gateway-server:
+#    image: gateway-server:latest
+#    ports:
+#      - 8080:8080
+#    networks:
+#      - spring-cloud-network
+#    depends_on:
+#      - eureka-server
+#    environment:
+#      server.port: 8080
+#      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
+
+  dream-server:
+    image: dream-server:latest
+    ports:
+      - 8082:8082
+    expose:
+      - 8082:8082
+    env_file:
+      - ./somnusDreamComment/src/main/.env
+    networks:
+      - spring-cloud-network
+      - tg_dreams
+    depends_on:
+      - eureka-server
+      - dreamDB
+    environment:
+
+      server.port: 8082
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+
+  user-server:
+    image: user-server:latest
+    ports:
+      - 8081:8081
+    networks:
+      - spring-cloud-network
+      - tg_auth
+    depends_on:
+      - eureka-server
+      - userDB
+    env_file:
+      - ./somnusAuth/src/main/.env
+    environment:
+      server.port: 8081
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
+    expose:
+      - 8081:8081
+
+  redis:
+    image: redis:alpine
+    command:
+      - redis-server
+    networks:
+      - bot_redis
+    env_file:
+      - ./somnus_bot/somnus_tg_bot/.env
+    restart: on-failure
+    ports:
+      - 6379:6379
+
+
+  tg_db:
+    image: 'postgres:13.3-alpine'
+    env_file:
+      - ./somnus_bot/somnus_tg_bot/.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: on-failure
+    networks:
+      - tg_bot_db
+    environment:
+      POSTGRES_DB: "somnus-tg-user"
+      POSTGRES_USER: "Nastia"
+      POSTGRES_PASSWORD: "qwerty"
+    ports:
+     - 7433:5432
+    expose:
+     - 7433:5432
+
+  bot:
+    image: tg_bot:latest
+    command: sh -c "python somnus_tg_bot/bot.py"
+    env_file:
+      - ./somnus_bot/somnus_tg_bot/.env
+
+    networks:
+      - tg_bot_db
+      - tg_auth
+      - tg_dreams
+      - bot_redis
+    environment:
+      DB_HOST: tg_db
+      DB_PORT: 5432
+      GET_RANDOM_DREAM_HOST: http://dream-server:8082/randomTG
+      POST_MY_DREAM_HOST: http://dream-server:8082/addTG
+      GET_ID_BY_EMAIL_HOST: http://user-server:8081/idByEmail
+      REDIS_HOST: redis
+    restart: always
+    depends_on:
+      - tg_db
+      - redis
+
+volumes:
+  pgdata:
+
+networks:
+  spring-cloud-network:
+    driver: bridge
+
+  tg_bot_db:
+    driver: bridge
+
+  tg_auth:
+    driver: bridge
+
+  tg_dreams:
+    driver: bridge
+
+  bot_redis:
+    driver: bridge
