@@ -1,16 +1,15 @@
 import requests
 import json
-import dotenv
-import os
 from requests.exceptions import ConnectionError
 import http
+from config_data.config import load_config, Config
 
-dotenv.load_dotenv('/home/nastia/javaProjects/SomnusMicro/somnus_bot/somnus_tg_bot/.env')
+config: Config = load_config('somnus_tg_bot/.env')
 
-URL = os.getenv('GET_ID_BY_EMAIL_HOST')
+URL = config.connections.email_endpoint
 
 def get_id_by_email(email:str) -> int:
-    data = {'userEmail':email}
+    data = {'userEmail':email.lower()}
     headers = {'content-type':'application/json'}
     try:
         response = requests.post(URL, data=json.dumps(data), headers=headers)

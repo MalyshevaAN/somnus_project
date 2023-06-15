@@ -41,22 +41,9 @@ services:
     networks:
       - spring-cloud-network
     environment:
+      server.port: 8761
       eureka.instance.hostname: eureka-server
       eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
-
-
-#  gateway-server:
-#    image: gateway-server:latest
-#    ports:
-#      - 8080:8080
-#    networks:
-#      - spring-cloud-network
-#    depends_on:
-#      - eureka-server
-#    environment:
-#      server.port: 8080
-#      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
-
 
   dream-server:
     image: dream-server:latest
@@ -73,7 +60,7 @@ services:
       - eureka-server
       - dreamDB
     environment:
-
+      spring.application.name: dream
       server.port: 8082
       eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
 
@@ -94,6 +81,26 @@ services:
       eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
     expose:
       - 8081:8081
+
+  gateway-server:
+    image: gateway-server:latest
+    ports:
+      - 8080:8080
+    expose:
+      - 8080:8080
+    networks:
+      - spring-cloud-network
+      - tg_gateway
+    depends_on:
+      - eureka-server
+      - dream-server
+      - user-server
+    env_file:
+      - ./somnusGateWay/src/main/.env
+    environment:
+      spring.application.name: proxy
+      server.port: 8080
+      eureka.client.serviceUrl.defaultZone: http://eureka-server:8761/eureka/
 
   redis:
     image: redis:alpine
@@ -137,17 +144,20 @@ services:
       - tg_auth
       - tg_dreams
       - bot_redis
+      - tg_gateway
     environment:
       DB_HOST: tg_db
       DB_PORT: 5432
-      GET_RANDOM_DREAM_HOST: http://dream-server:8082/randomTG
-      POST_MY_DREAM_HOST: http://dream-server:8082/addTG
-      GET_ID_BY_EMAIL_HOST: http://user-server:8081/idByEmail
+      GET_RANDOM_DREAM_HOST: http://gateway-server:8080/dream/randomTG
+      POST_MY_DREAM_HOST: http://gateway-server:8080/dream/addTG
+      GET_ID_BY_EMAIL_HOST: http://gateway-server:8080/user/idByEmail
       REDIS_HOST: redis
     restart: always
     depends_on:
       - tg_db
       - redis
+      - dream-server
+      - user-server
 
 volumes:
   pgdata:
@@ -163,6 +173,9 @@ networks:
     driver: bridge
 
   tg_dreams:
+    driver: bridge
+
+  tg_gateway:
     driver: bridge
 
   bot_redis:

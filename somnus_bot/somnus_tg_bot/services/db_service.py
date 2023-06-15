@@ -1,6 +1,7 @@
 from database.database import create_table, insert_data, get_data, get_all_tg_users
 from lexicon.lexicon_ru import LEXICON_POSSIBLE_RESPONSE
 from psycopg2 import OperationalError
+from psycopg2.errors import UniqueViolation
 
 
 def create_user_table():
@@ -15,6 +16,9 @@ def insert_new_user(tg_id:int, somnus_id:int) -> int:
         return LEXICON_POSSIBLE_RESPONSE['OK']
     except OperationalError as e:
         return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']
+
+    except UniqueViolation as e:
+        return LEXICON_POSSIBLE_RESPONSE['UNIQUE_VIOLATION']
 
 
 def get_user_somnus_id(tg_id:int) -> int:

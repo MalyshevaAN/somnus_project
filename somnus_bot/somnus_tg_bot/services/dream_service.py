@@ -4,13 +4,13 @@ import http
 from requests.exceptions import ConnectionError
 from services.db_service import get_user_somnus_id
 from lexicon.lexicon_ru import LEXICON_POSSIBLE_RESPONSE
+from config_data.config import Config, load_config
 
-dotenv.load_dotenv('somnus_tg_bot/.env')
+config: Config = load_config('somnus_tg_bot/.env')
 
+URL_GET = config.connections.random_dream_endpoint
 
-URL_GET = os.getenv('GET_RANDOM_DREAM_HOST')
-
-URL_POST = os.getenv('POST_MY_DREAM_HOST')
+URL_POST = config.connections.post_dream_endpoint
 
 def get_random_dream() -> str|int:
     try:

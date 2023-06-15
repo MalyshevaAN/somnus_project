@@ -1,18 +1,16 @@
 import smtplib
 
-import os, dotenv
+from config_data.config import Config, load_config
 
-dotenv.load_dotenv()
+config: Config = load_config('somnus_tg_bot/.env')
 
-user = os.getenv('EMAIL_USER')
-password = os.getenv('EMAIL_PASSWORD')
-server = os.getenv('EMAIL_SERVER')
+user = config.mail.email_user
+password = config.mail.email_password
+server = config.mail.email_server
 port = 587
 
 def send_code(recieiver_email:str, code: str) -> bool:
-
     subject = "Somnus: code for account connection"
-
     to =  recieiver_email
     charset = 'Content-Type: text/plain; charset=utf-8'
     mime = 'MIME-Version:1.0'

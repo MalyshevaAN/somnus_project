@@ -1,5 +1,5 @@
 from aiogram import Router, Bot
-import dotenv, os
+from config_data.config import Config, load_config
 from services.image_service import get_good_morning_image
 from services.db_service import get_all_users
 import asyncio
@@ -17,10 +17,9 @@ logging.basicConfig(
         format='%(filename)s:%(lineno)d #%(levelname)-8s '
                '[%(asctime)s] - %(name)s - %(message)s')
 
-dotenv.load_dotenv()
+config: Config = load_config('somnus_tg_bot/.env')
 
-bot: Bot = Bot(os.getenv('BOT_TOKEN'))
-
+bot: Bot = Bot(config.tg_bot.token)
 
 @router.message()
 async def send_good_morning():

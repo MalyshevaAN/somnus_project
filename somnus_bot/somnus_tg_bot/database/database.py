@@ -1,20 +1,17 @@
 import psycopg2
+from  config_data.config import load_config, Config
 
-import dotenv
+config:Config = load_config('somnus_tg_bot/.env')
 
-import os
+DB_NAME = config.db.db_name
 
-dotenv.load_dotenv()
+DB_HOST = config.db.db_host
 
-DB_NAME = os.getenv('DB_NAME')
+DB_PORT = config.db.db_port
 
-DB_HOST = os.getenv('DB_HOST')
+DB_USER = config.db.db_user
 
-DB_PORT = os.getenv('DB_PORT')
-
-DB_USER = os.getenv('DB_USER')
-
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_PASSWORD = config.db.db_password
 
 
 def get_connection():

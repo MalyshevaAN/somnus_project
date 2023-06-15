@@ -1,5 +1,4 @@
 from aiogram.filters import BaseFilter
-from aiogram.types import CallbackQuery
 from aiogram.types import Message
 
 class IsTextMessage(BaseFilter):

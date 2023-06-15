@@ -28,14 +28,14 @@ async def main():
         logger.error("Can not connect to the database")
         raise OperationalError
 
-    config:Config = load_config("/home/nastia/javaProjects/SomnusMicro/somnus_bot/somnus_tg_bot/.env")
+    config:Config = load_config("somnus_tg_bot/.env")
 
 
     bot:Bot = Bot(config.tg_bot.token, parse_mode='HTML')
     redis: Redis = Redis(host=config.redis.host)
     storage: RedisStorage = RedisStorage(redis=redis)
     storage2: MemoryStorage = MemoryStorage()
-    dp: Dispatcher = Dispatcher(storage=storage)
+    dp: Dispatcher = Dispatcher(storage=storage2)
 
     asyncio.create_task(scheduler())
     await set_first_menu(bot=bot)
