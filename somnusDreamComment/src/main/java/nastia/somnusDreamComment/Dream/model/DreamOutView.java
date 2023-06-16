@@ -20,6 +20,7 @@ public class DreamOutView {
     private final LocalDateTime localDateTime = LocalDateTime.now();
 
     private Long author;
+    private String authorUsername;
 
     private Set<Comment> comments = new HashSet<>();
 

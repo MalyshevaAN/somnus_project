@@ -14,22 +14,18 @@ import java.util.Set;
 
 public interface UserServiceInterface {
 
-    UserOutView getByEmailTG(@NonNull UserInViewTG userInViewTG) throws UserIsNotFoundException;
+    UserOutView getByEmailTG(@NonNull UserInViewTG userInViewTG) throws MyException;
 
-    Optional<User> getByEmail(@NonNull String email) throws UserIsNotFoundException;
+    User getByEmail(@NonNull String email) throws MyException;
 
-    UserOutView addUser(UserInView userIn) throws UserAlreadyExists, PasswordDifferException;
-
-//    UserOutView addUser(UserInView userIn, MultipartFile file) throws UserAlreadyExists, PasswordDifferException, UploadException, UserHasNoAvatarException, ReadExeption;
-//
-
+    UserOutView addUser(UserInView userIn) throws MyException;
 
     Optional<User> getUserById(long id);
 
-    Optional<UserOutView> saveFollow(long clientId, long userId);
-    Optional<UserOutView> deleteFollow(long clientId, long userId);
+    UserOutView saveFollow(long clientId, long userId) throws MyException;
+    UserOutView deleteFollow(long clientId, long userId) throws  MyException;
 
-    Set<UserOutView> getSubscriptions(long userId);
+    Set<UserOutView> getSubscriptions(long userId) throws MyException;
     Set<UserOutView> getSubscribers(long userId);
-    UserOutView addAvatar(MultipartFile file, long userId) throws UserIsNotFoundException, UploadException, UserHasNoAvatarException, ReadExeption;
+    UserOutView addAvatar(MultipartFile file, long userId) throws MyException;
 }

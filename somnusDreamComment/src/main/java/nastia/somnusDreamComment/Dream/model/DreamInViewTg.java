@@ -11,4 +11,5 @@ import org.springframework.stereotype.Component;
 public class DreamInViewTg {
     private String text;
     private Long authorId;
+    private String authorUsername;
 }

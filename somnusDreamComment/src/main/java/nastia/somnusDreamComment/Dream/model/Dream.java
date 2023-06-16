@@ -1,7 +1,5 @@
 package nastia.somnusDreamComment.Dream.model;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import nastia.somnusDreamComment.Comment.model.Comment;
@@ -33,15 +31,12 @@ public class Dream {
 
     private Long authorId;
 
+    private String authorUsername;
+
 
     @OneToMany(mappedBy = "dream", fetch = FetchType.EAGER)
     private Set<Comment> comments = new HashSet<>();
 
     private Set<Long> likes = new HashSet<>();
-
-    public Dream(String dreamText, Long userId) {
-        this.dreamText = dreamText;
-        this.authorId = userId;
-    }
 
 }

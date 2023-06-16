@@ -22,14 +22,11 @@ import java.util.Date;
 public class JwtProvider {
 
     private final SecretKey jwtAccessSecret;
-    private final SecretKey jwtRefreshSecret;
 
     public JwtProvider(
-            @Value("${jwt.secret.access}") String jwtAccessSecret, //уберу в секреты
-            @Value("${jwt.secret.refresh}") String jwtRefreshSecret //уберу в секреты (переменные окружения)
+            @Value("${jwt.secret.access}") String jwtAccessSecret
     ) {
         this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtAccessSecret));
-        this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtRefreshSecret));
     }
 
     public String generateAccessToken(@NonNull User user) {
@@ -41,28 +38,14 @@ public class JwtProvider {
                 .setExpiration(accessExpiration)
                 .signWith(jwtAccessSecret)
                 .claim("id", user.getId())
-                .claim("firstName", user.getFirstName())
+                .claim("userName", user.getFirstName() + user.getLastName())
                 .claim("roles", user.getRoles())
                 .compact();
     }
 
-    public String generateRefreshToken(@NonNull User user) {
-        final LocalDateTime now = LocalDateTime.now();
-        final Instant refreshExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
-        final Date refreshExpiration = Date.from(refreshExpirationInstant);
-        return Jwts.builder()
-                .setSubject(user.getEmail())
-                .setExpiration(refreshExpiration)
-                .signWith(jwtRefreshSecret)
-                .compact();
-    }
 
     public boolean validateAccessToken(@NonNull String accessToken) {
         return validateToken(accessToken, jwtAccessSecret);
-    }
-
-    public boolean validateRefreshToken(@NonNull String refreshToken) {
-        return validateToken(refreshToken, jwtRefreshSecret);
     }
 
     private boolean validateToken(@NonNull String token, @NonNull Key secret) {
@@ -88,10 +71,6 @@ public class JwtProvider {
 
     public Claims getAccessClaims(@NonNull String token) {
         return getClaims(token, jwtAccessSecret);
-    }
-
-    public Claims getRefreshClaims(@NonNull String token) {
-        return getClaims(token, jwtRefreshSecret);
     }
 
     private Claims getClaims(@NonNull String token, @NonNull Key secret) {

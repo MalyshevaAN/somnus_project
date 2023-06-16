@@ -2,10 +2,12 @@ package nastia.somnusAuth.authorization.service;
 
 
 import nastia.somnusAuth.authorization.domain.Avatar;
+import nastia.somnusAuth.authorization.exception.MyException;
 import nastia.somnusAuth.authorization.exception.UploadException;
 import nastia.somnusAuth.authorization.exception.UserHasNoAvatarException;
 import nastia.somnusAuth.authorization.repository.AvatarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -21,7 +23,7 @@ public class AvatarService implements AvatarServiceInterface{
     private final String PATH = "/home/nastia/Somnus/UserAvatars/";
 
 
-    //по одной аватарке на юзера или же хранить историю аватарок? пока сделаю по одной на юзера, дальше посмотрим
+
     public Long uploadAvatar(MultipartFile file, long userId) throws UploadException {
         String filename = userId + "_" + file.getOriginalFilename();
         String fullPath = PATH + filename;
@@ -41,15 +43,11 @@ public class AvatarService implements AvatarServiceInterface{
             }
             return avatarRepository.save(avatar).getId();
         }
-        throw new UploadException();
+        throw new MyException(HttpStatus.BAD_REQUEST, "Такая фотография уже загружена");
     }
 
-    public String downloadAvatar(long userId) throws UserHasNoAvatarException {
+    public String downloadAvatar(long userId) {
         Optional<Avatar>  userAvatar = avatarRepository.findByUserId(userId);
-        System.out.println(userAvatar);
-        if (userAvatar.isPresent()){
-            return userAvatar.get().getImagePath();
-        }
-        throw new UserHasNoAvatarException();
+        return userAvatar.map(Avatar::getImagePath).orElse(null);
     }
 }

@@ -2,9 +2,7 @@ package nastia.somnusDreamComment.Dream.service;
 
 
 
-import nastia.somnusDreamComment.Comment.exception.DreamNotExistsException;
-import nastia.somnusDreamComment.Dream.exception.DreamNotFoundException;
-import nastia.somnusDreamComment.Dream.exception.UserHaveNoRights;
+import nastia.somnusDreamComment.Dream.exception.MyDreamException;
 import nastia.somnusDreamComment.Dream.model.Dream;
 import nastia.somnusDreamComment.Dream.model.DreamInView;
 import nastia.somnusDreamComment.Dream.model.DreamInViewTg;
@@ -14,23 +12,23 @@ import java.util.*;
 
 
 public interface DreamServiceInterface {
-    Optional<Dream> getDreamById(long dreamId);
+    Optional<Dream> getDreamById(long dreamId) ;
 
-    Optional<DreamOutView> readDream(long dreamId) throws DreamNotFoundException;
+    DreamOutView readDream(long dreamId) throws MyDreamException;
 
-    Optional<DreamOutView> addDream(DreamInView dreamInView, Long authorId);
+    DreamOutView addDream(DreamInView dreamInView, Long authorId, String authorUsername);
 
-    Optional<DreamOutView> addDreamTg(DreamInViewTg dreamInViewTg);
+    DreamOutView addDreamTg(DreamInViewTg dreamInViewTg) ;
 
-    Optional<DreamOutView> updateDream(DreamInView dreamUpdate, Long authorId, long dreamId) throws DreamNotFoundException, UserHaveNoRights;
+    DreamOutView updateDream(DreamInView dreamUpdate, Long authorId, long dreamId) throws MyDreamException;
 
-    void deleteDream(long dreamId, long userId) throws DreamNotFoundException, UserHaveNoRights;
+    void deleteDream(long dreamId, long userId) throws MyDreamException;
 
     List<DreamOutView> getAllDreams();
-    Optional<DreamOutView> getRandomDream();
+    DreamOutView getRandomDream() throws MyDreamException;
 
     List<DreamOutView> getUserDreams(long authorId);
 
-    Optional<DreamOutView> likeDream(long dreamId, long userId, boolean like) throws DreamNotExistsException;
+    DreamOutView likeDream(long dreamId, long userId, boolean like) throws MyDreamException;
 
 }

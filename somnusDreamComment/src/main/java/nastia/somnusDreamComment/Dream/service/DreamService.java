@@ -1,19 +1,17 @@
 package nastia.somnusDreamComment.Dream.service;
 
 
-import nastia.somnusDreamComment.Comment.exception.DreamNotExistsException;
-import nastia.somnusDreamComment.Dream.exception.UserHaveNoRights;
-import nastia.somnusDreamComment.Dream.exception.DreamNotFoundException;
+import nastia.somnusDreamComment.Dream.exception.MyDreamException;
 import nastia.somnusDreamComment.Dream.model.Dream;
 import nastia.somnusDreamComment.Dream.model.DreamInView;
 import nastia.somnusDreamComment.Dream.model.DreamInViewTg;
 import nastia.somnusDreamComment.Dream.model.DreamOutView;
 import nastia.somnusDreamComment.Dream.repository.DreamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,51 +24,51 @@ public class DreamService implements DreamServiceInterface {
 //    @Autowired
 //    UserService userService;
 
-    public Optional<Dream> getDreamById(long dreamId){
-        return dreamRepository.findById(dreamId);
+    public Optional<Dream> getDreamById(long dreamId)  {
+
+         return dreamRepository.findById(dreamId);
     }
 
-    public Optional<DreamOutView> readDream(long dreamId) throws DreamNotFoundException {
+    public DreamOutView readDream(long dreamId) throws MyDreamException {
         Optional<Dream> dream = getDreamById(dreamId);
         if (dream.isPresent()){
-            return Optional.of(createDreamOutView(dream.get()));
+            return createDreamOutView(dream.get());
         }
-        throw new DreamNotFoundException("dream is not found");
+        throw new MyDreamException(HttpStatus.NOT_FOUND, "Сон с таким id не найден");
     }
 
-    public Optional<DreamOutView> addDream(DreamInView dreamInView, Long authorId){
-        Dream newDream = new Dream(dreamInView.getDreamText(), authorId);
-        return Optional.of(createDreamOutView(dreamRepository.save(newDream)));
+    public DreamOutView addDream(DreamInView dreamInView, Long authorId, String authorUsername){
+        Dream newDream = createDreamView(dreamInView.getDreamText(), authorId, authorUsername);
+        return createDreamOutView(dreamRepository.save(newDream));
     }
 
     @Override
-    public Optional<DreamOutView> addDreamTg(DreamInViewTg dreamInViewTg) {
-        Dream newDream = new Dream(dreamInViewTg.getText(), dreamInViewTg.getAuthorId());
-        return Optional.of(createDreamOutView(dreamRepository.save(newDream)));
+    public DreamOutView addDreamTg(DreamInViewTg dreamInViewTg) {
+        Dream newDream = createDreamView(dreamInViewTg.getText(), dreamInViewTg.getAuthorId(), dreamInViewTg.getAuthorUsername());
+        return createDreamOutView(dreamRepository.save(newDream));
     }
 
-    public Optional<DreamOutView> updateDream(DreamInView dreamUpdate, Long authorId, long dreamId) throws DreamNotFoundException, UserHaveNoRights {
+    public DreamOutView updateDream(DreamInView dreamUpdate, Long authorId, long dreamId) throws MyDreamException {
         Optional<Dream> dream = dreamRepository.findById(dreamId);
         if (dream.isEmpty()){
-            throw new DreamNotFoundException("dream is not found");
+            throw new MyDreamException(HttpStatus.NOT_FOUND, "Сон с таким id не найден");
         }
         if (!Objects.equals(dream.get().getAuthorId(), authorId)){
-            throw new UserHaveNoRights();
+            throw new MyDreamException(HttpStatus.NOT_ACCEPTABLE, "Нельзя редактировать чужой сон");
         }
         Dream updatedDream = dream.get();
         updatedDream.setDreamText(dreamUpdate.getDreamText());
         updatedDream = dreamRepository.save(updatedDream);
-        DreamOutView dreamOutView = createDreamOutView(updatedDream);
-        return Optional.of(dreamOutView);
+        return createDreamOutView(updatedDream);
     }
 
-    public void deleteDream(long dreamId, long userId) throws DreamNotFoundException, UserHaveNoRights {
+    public void deleteDream(long dreamId, long userId) throws MyDreamException {
         Optional<Dream> dream  = dreamRepository.findById(dreamId);
         if (dream.isEmpty()){
-            throw new DreamNotFoundException();
+            throw new MyDreamException(HttpStatus.NOT_FOUND, "Сон с таким id не найден");
         }
         if (dream.get().getAuthorId() != userId){
-            throw new UserHaveNoRights();
+            throw new MyDreamException(HttpStatus.NOT_ACCEPTABLE, "Нельзя удалять чужие сны");
         }
         dreamRepository.delete(dream.get());
     }
@@ -81,25 +79,23 @@ public class DreamService implements DreamServiceInterface {
     }
 
 
-    public Optional<DreamOutView> getRandomDream(){
+    public DreamOutView getRandomDream(){
         if (dreamRepository.count() == 0){
-            return Optional.empty();
+            throw new MyDreamException(HttpStatus.NOT_FOUND, "Еще ни один сон не записан");
         }
         Optional<Dream> lastDream = dreamRepository.findFirstByOrderByIdDesc();
         if (dreamRepository.count() == 1){
-            return Optional.of(createDreamOutView(lastDream.get()));
+            return createDreamOutView(lastDream.get());
         }
-        if (lastDream.isPresent()) {
-            long lastId = lastDream.get().getId();
 
-            long randId = (long) (Math.random()*lastId + 1);
-            while (dreamRepository.findById(randId).isEmpty()) {
-                System.out.println(randId);
-                randId = (long) (Math.random()*lastId + 1);
-            }
-            return Optional.of(createDreamOutView(dreamRepository.findById(randId).get()));
+        long lastId = lastDream.get().getId();
+
+        long randId = (long) (Math.random()*lastId + 1);
+        while (dreamRepository.findById(randId).isEmpty()) {
+            System.out.println(randId);
+            randId = (long) (Math.random()*lastId + 1);
         }
-        return Optional.empty();
+        return createDreamOutView(dreamRepository.findById(randId).get());
     }
 
     public List<DreamOutView> getUserDreams(long authorId){
@@ -110,21 +106,20 @@ public class DreamService implements DreamServiceInterface {
         return new ArrayList<>();
     }
 
-    public Optional<DreamOutView> likeDream(long dreamId, long userId, boolean like) throws DreamNotExistsException {
+    public DreamOutView likeDream(long dreamId, long userId, boolean like) throws MyDreamException {
         Optional<Dream> dream = dreamRepository.findById(dreamId);
         if (dream.isEmpty()){
-            throw new DreamNotExistsException();
+            throw new MyDreamException(HttpStatus.NOT_FOUND, "Сон с таким id не найден");
         }
-
         Dream dreamLike = dream.get();
-        Set likes = dreamLike.getLikes();
+        Set<Long> likes = dreamLike.getLikes();
         if (likes.add(userId)){
             dreamLike.setLikes(likes);
-            return Optional.of(createDreamOutView(dreamRepository.save(dreamLike)));
+            return createDreamOutView(dreamRepository.save(dreamLike));
         }else{
             likes.remove(userId);
             dreamLike.setLikes(likes);
-            return Optional.of(createDreamOutView(dreamRepository.save(dreamLike)));
+            return createDreamOutView(dreamRepository.save(dreamLike));
         }
     }
 
@@ -136,6 +131,14 @@ public class DreamService implements DreamServiceInterface {
         dreamOutView.setComments(dream.getComments());
         dreamOutView.setAuthor(dream.getAuthorId());
         return dreamOutView;
+    }
+
+    private Dream createDreamView(String dream, long authorId, String authorUsername){
+        Dream newDream = new Dream();
+        newDream.setDreamText(dream);
+        newDream.setAuthorId(authorId);
+        newDream.setAuthorUsername(authorUsername);
+        return newDream;
     }
 
     private List<DreamOutView> DreamOutList(List<Dream> dreams){

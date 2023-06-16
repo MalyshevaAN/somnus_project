@@ -19,24 +19,17 @@ public class JwtCheck {
 
     private final SecretKey jwtAccessSecret;
 
-    private final SecretKey jwtRefreshSecret;
 
     public JwtCheck(
-            @Value("${jwt.secret.access}") String jwtAccessSecret,
-            @Value("${jwt.secret.refresh}") String jwtRefreshSecret
+            @Value("${jwt.secret.access}") String jwtAccessSecret
     ){
         this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtAccessSecret));
-        this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtRefreshSecret));
     }
 
     public boolean validateAccessToken(@NonNull String accessToken){
         return validateToken(accessToken, jwtAccessSecret);
     }
 
-
-    public boolean validateRefreshToken(@NonNull String refreshToken){
-        return validateToken(refreshToken, jwtRefreshSecret);
-    }
 
     public boolean validateToken(@NonNull String token, @NonNull Key secret){
         try {
@@ -60,10 +53,6 @@ public class JwtCheck {
     }
     public Claims getAccessClaims(@NonNull String token){
         return getClaims(token, jwtAccessSecret);
-    }
-
-    public Claims getRefreshClaims(@NonNull String token){
-        return getClaims(token, jwtRefreshSecret);
     }
 
     private Claims getClaims(@NonNull String token, @NonNull Key secret){

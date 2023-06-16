@@ -1,11 +1,9 @@
 package nastia.somnusDreamComment.Dream.controller;
 
 
-import nastia.somnusDreamComment.Comment.exception.DreamNotExistsException;
 import nastia.somnusDreamComment.Dream.checkAuthorization.AuthCheckService;
 import nastia.somnusDreamComment.Dream.checkAuthorization.JwtAuthenticationDreams;
-import nastia.somnusDreamComment.Dream.exception.DreamNotFoundException;
-import nastia.somnusDreamComment.Dream.exception.UserHaveNoRights;
+import nastia.somnusDreamComment.Dream.exception.MyDreamException;
 import nastia.somnusDreamComment.Dream.model.DreamInView;
 import nastia.somnusDreamComment.Dream.model.DreamOutView;
 import nastia.somnusDreamComment.Dream.service.DreamServiceInterface;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class DreamController {
@@ -33,30 +30,28 @@ public class DreamController {
     @GetMapping("read/{dreamId}")
     public ResponseEntity<DreamOutView> getDream(@PathVariable long dreamId){
         try {
-            Optional<DreamOutView> dream = dreamService.readDream(dreamId);
-            return ResponseEntity.ok().body(dream.get());
-        } catch (DreamNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            DreamOutView dream = dreamService.readDream(dreamId);
+            return ResponseEntity.ok().body(dream);
+        } catch (MyDreamException e) {
+            return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @PostMapping("add")
     public ResponseEntity<DreamOutView>  addDream(@RequestBody DreamInView dreamInView){
         final JwtAuthenticationDreams authInfo = authService.getAuthInfo();
-        Optional<DreamOutView> dream = dreamService.addDream(dreamInView, authInfo.getCredentials());
-        return dream.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        DreamOutView dream = dreamService.addDream(dreamInView, authInfo.getCredentials(), authInfo.getUserName());
+        return ResponseEntity.ok().body(dream);
     }
 
     @PutMapping("update/{id}")
     public ResponseEntity<DreamOutView> updateDream(@RequestBody DreamInView dreamUpdate, @PathVariable long id){
         final JwtAuthenticationDreams authInfo = authService.getAuthInfo();
         try {
-            Optional<DreamOutView> newDream = dreamService.updateDream(dreamUpdate, authInfo.getCredentials(), id);
-            return ResponseEntity.ok().body(newDream.get());
-        } catch (DreamNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (UserHaveNoRights e){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            DreamOutView newDream = dreamService.updateDream(dreamUpdate, authInfo.getCredentials(), id);
+            return ResponseEntity.ok().body(newDream);
+        } catch (MyDreamException e){
+            return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
@@ -66,10 +61,8 @@ public class DreamController {
         try{
             dreamService.deleteDream(id, authInfo.getCredentials());
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch(DreamNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }catch (UserHaveNoRights e){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (MyDreamException e){
+            return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
@@ -80,8 +73,12 @@ public class DreamController {
 
     @GetMapping("random")
     public ResponseEntity<DreamOutView> getRandomDream(){
-        Optional<DreamOutView> dream = dreamService.getRandomDream();
-        return dream.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            DreamOutView dream = dreamService.getRandomDream();
+            return ResponseEntity.ok().body(dream);
+        }catch (MyDreamException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
     }
 
     @GetMapping("users/{userId}")
@@ -101,10 +98,10 @@ public class DreamController {
     public ResponseEntity<DreamOutView> likeDream(@PathVariable long dreamId){
         final JwtAuthenticationDreams authInfo = authService.getAuthInfo();
         try {
-            Optional<DreamOutView> likedDream = dreamService.likeDream(dreamId, authInfo.getCredentials(), true);
-            return ResponseEntity.ok().body(likedDream.get());
-        }catch (DreamNotExistsException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            DreamOutView likedDream = dreamService.likeDream(dreamId, authInfo.getCredentials(), true);
+            return ResponseEntity.ok().body(likedDream);
+        }catch (MyDreamException e){
+            return new ResponseEntity<>(e.getStatusCode());
         }
     }
 }

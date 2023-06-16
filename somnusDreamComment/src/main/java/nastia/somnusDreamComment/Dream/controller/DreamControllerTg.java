@@ -3,6 +3,7 @@ package nastia.somnusDreamComment.Dream.controller;
 
 import nastia.somnusDreamComment.Dream.checkAuthorization.AuthCheckService;
 import nastia.somnusDreamComment.Dream.checkAuthorization.JwtAuthenticationDreams;
+import nastia.somnusDreamComment.Dream.exception.MyDreamException;
 import nastia.somnusDreamComment.Dream.model.DreamInView;
 import nastia.somnusDreamComment.Dream.model.DreamInViewTg;
 import nastia.somnusDreamComment.Dream.model.DreamOutView;
@@ -27,13 +28,17 @@ public class DreamControllerTg {
 
     @GetMapping("randomTG")
     public ResponseEntity<DreamOutView> getRandomDream(){
-        Optional<DreamOutView> dream = dreamService.getRandomDream();
-        return dream.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            DreamOutView dream = dreamService.getRandomDream();
+            return ResponseEntity.ok().body(dream);
+        } catch (MyDreamException e){
+            return new ResponseEntity<>(e.getStatusCode());
+        }
     }
 
     @PostMapping("addTG")
     public ResponseEntity<DreamOutView> postDreamFromTg(@RequestBody DreamInViewTg dreamInViewTg){
-        Optional<DreamOutView> dream = dreamService.addDreamTg(dreamInViewTg);
-        return dream.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        DreamOutView dream = dreamService.addDreamTg(dreamInViewTg);
+        return ResponseEntity.ok().body(dream);
     }
 }
