@@ -28,25 +28,25 @@ def use_bd(sql: str):
     conn.close()
 
 def create_table() -> None:
-    sql_create = '''CREATE TABLE IF NOT EXISTS SOMNUSTG(
+    sql_create = '''CREATE TABLE IF NOT EXISTS SOMNUSUSERTG(
         ID SERIAL PRIMARY KEY,
         tg_id BIGINT NOT NUll UNIQUE,
         somnus_id BIGINT NOT NULL UNIQUE,
-        authorUsername VARCHAR(255)
+        author_username VARCHAR(255) NOT NULL
     );
     '''
     use_bd(sql_create)
 
 
 def insert_data(tg_id:int, somnus_id:int, authorUsername:str):
-    sql_insert = f'INSERT INTO SOMNUSTG (tg_id, somnus_id, authorUsername) VALUES ({tg_id}, {somnus_id}, {authorUsername})'
+    sql_insert = f"INSERT INTO SOMNUSUSERTG (tg_id, somnus_id, author_username) VALUES ({tg_id}, {somnus_id}, '{authorUsername}')"
     use_bd(sql_insert)
 
 
 def get_data(tg_id:int) -> tuple:
     conn = get_connection()
     cursor = conn.cursor()
-    sql_get = f'SELECT * FROM SOMNUSTG WHERE tg_id={tg_id}'
+    sql_get = f'SELECT * FROM SOMNUSUSERTG WHERE tg_id={tg_id}'
     cursor.execute(sql_get)
     bd_id, tg_id_bd, somnus_id, authorUsername = cursor.fetchone()
     cursor.close()
@@ -56,7 +56,7 @@ def get_data(tg_id:int) -> tuple:
 def get_all_tg_users() -> list[int]:
     conn = get_connection()
     cursor = conn.cursor()
-    sql_get_all = f'SELECT tg_id FROM SOMNUSTG'
+    sql_get_all = f'SELECT tg_id FROM SOMNUSUSERTG'
     cursor.execute(sql_get_all)
     tg_ids = []
     for elem in cursor.fetchall():

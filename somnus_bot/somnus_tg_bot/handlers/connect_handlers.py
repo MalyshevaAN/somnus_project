@@ -16,6 +16,10 @@ from services.email_service import send_code
 from config_data.config import Config, load_config
 from keyboards.keyboard_utils import create_keyboard
 from filters.commands_filter import CommandFilter
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 config: Config = load_config('somnus_tg_bot/.env')
 bot: Bot = Bot(config.tg_bot.token)
@@ -44,8 +48,15 @@ async def command_send_mail(message: Message):
 @router.message(StateFilter(FSMConnectAccounts.send_email))
 async def process_send_email(message: Message, state: FSMContext):
     user = get_user_by_email(message.text)
+    print(user)
+    logger.info(user)
+    if user == LEXICON_POSSIBLE_RESPONSE['NOT_FOUND'] :
+        await message.answer(LEXICON['email_not_exists'], reply_markup=create_keyboard('email_again', 'cancel_connection'))
+    elif user == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR'] or user is None:
+        await message.answer(LEXICON['something_went_wrong'])
+        await state.clear()
     id = user.get('id')
-    authorUsername = user.get('firstName') + " " + user.get('lastName')
+    authorUsername = user['firstName'] + " " + user['lastName']
     if id > 0:
         code = generate_code()
         sended = send_code(message.text, code)
@@ -58,12 +69,6 @@ async def process_send_email(message: Message, state: FSMContext):
         else:
             await message.answer(LEXICON['mail_error'])
             await state.clear()
-
-    elif id == -1:
-        await message.answer(LEXICON['email_not_exists'], reply_markup=create_keyboard('email_again', 'cancel_connection'))
-    elif id == -2:
-        await message.answer(LEXICON['something_went_wrong'])
-        await state.clear()
 
 
 @router.callback_query(StateFilter(FSMConnectAccounts.send_email), Text(text='email_again'))
@@ -85,7 +90,7 @@ async def process_check_code(message: Message, state: FSMContext):
     info = await state.get_data()
     if (message.text.replace(' ', '') == info['code']):
         user_info = await state.get_data()
-        response_status = insert_new_user(int(message.from_user.id), user_info['id'], user_info['authorUsername'])
+        response_status = insert_new_user(int(message.from_user.id), int(user_info['id']), user_info['authorUsername'])
         if response_status == LEXICON_POSSIBLE_RESPONSE['OK'] or response_status == LEXICON_POSSIBLE_RESPONSE['UNIQUE_VIOLATION']:
             await message.answer(LEXICON['accounts_are_connected'])
             await state.set_state(FSMConnectAccounts.connected)

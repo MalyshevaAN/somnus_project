@@ -1,6 +1,16 @@
 import smtplib
 
 from config_data.config import Config, load_config
+import logging
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+        level=logging.INFO,
+        format='%(filename)s:%(lineno)d #%(levelname)-8s '
+               '[%(asctime)s] - %(name)s - %(message)s')
+
+
 
 config: Config = load_config('somnus_tg_bot/.env')
 
@@ -25,9 +35,11 @@ def send_code(recieiver_email:str, code: str) -> bool:
         smtp.ehlo()
         smtp.login(user, password)
         smtp.sendmail(user, to, body.encode('utf-8'))
+        logger.info("message is send")
         return True
     except smtplib.SMTPException as err:
-        print('something went wrong', err)
+
+        logger.error("email error")
         return False
     finally:
         smtp.quit()

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@CrossOrigin(origins = "http://localhost:3000")
 public class SomnusGateWayApplication {
 
 	public static void main(String[] args) {

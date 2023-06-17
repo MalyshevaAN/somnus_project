@@ -14,6 +14,7 @@ import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin
 public class Controller {
 
     @Autowired

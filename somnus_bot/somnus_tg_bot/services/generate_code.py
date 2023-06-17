@@ -1,4 +1,5 @@
 import random
+import logging
 
 def generate_code() -> str:
     code = ''
