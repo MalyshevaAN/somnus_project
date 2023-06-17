@@ -21,9 +21,6 @@ public class DreamService implements DreamServiceInterface {
     @Autowired
     DreamRepository dreamRepository;
 
-//    @Autowired
-//    UserService userService;
-
     public Optional<Dream> getDreamById(long dreamId)  {
 
          return dreamRepository.findById(dreamId);

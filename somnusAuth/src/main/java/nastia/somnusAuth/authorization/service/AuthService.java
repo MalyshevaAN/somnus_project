@@ -26,7 +26,6 @@ public class AuthService implements AuthServiceInterface{
     }
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws MyException {
-
         final User user = userService.getByEmail(authRequest.getEmail());
         if (user.getPassword().equals(applicationConfig.HashPassword(authRequest.getPassword()))) {
             final String accessToken = jwtProvider.generateAccessToken(user);
