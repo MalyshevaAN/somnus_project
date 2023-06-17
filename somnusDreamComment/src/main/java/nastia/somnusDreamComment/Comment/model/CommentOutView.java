@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class CommentOutView {
     private long Id;
     private Long userId;
-//    private Dream dream;
+    private String authorUserName;
     private String commentText;
     private final LocalDateTime timeCreation = LocalDateTime.now();
 }

@@ -31,26 +31,27 @@ def create_table() -> None:
     sql_create = '''CREATE TABLE IF NOT EXISTS SOMNUSTG(
         ID SERIAL PRIMARY KEY,
         tg_id BIGINT NOT NUll UNIQUE,
-        somnus_id BIGINT NOT NULL UNIQUE
+        somnus_id BIGINT NOT NULL UNIQUE,
+        authorUsername VARCHAR(255)
     );
     '''
     use_bd(sql_create)
 
 
-def insert_data(tg_id:int, somnus_id:int):
-    sql_insert = f'INSERT INTO SOMNUSTG (tg_id, somnus_id) VALUES ({tg_id}, {somnus_id})'
+def insert_data(tg_id:int, somnus_id:int, authorUsername:str):
+    sql_insert = f'INSERT INTO SOMNUSTG (tg_id, somnus_id, authorUsername) VALUES ({tg_id}, {somnus_id}, {authorUsername})'
     use_bd(sql_insert)
 
 
-def get_data(tg_id:int) -> int:
+def get_data(tg_id:int) -> tuple:
     conn = get_connection()
     cursor = conn.cursor()
     sql_get = f'SELECT * FROM SOMNUSTG WHERE tg_id={tg_id}'
     cursor.execute(sql_get)
-    bd_id, tg_id_bd, somnus_id = cursor.fetchone()
+    bd_id, tg_id_bd, somnus_id, authorUsername = cursor.fetchone()
     cursor.close()
     conn.close()
-    return somnus_id
+    return (somnus_id, authorUsername)
 
 def get_all_tg_users() -> list[int]:
     conn = get_connection()

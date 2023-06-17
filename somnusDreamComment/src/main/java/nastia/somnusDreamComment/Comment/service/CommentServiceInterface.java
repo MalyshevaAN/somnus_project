@@ -1,22 +1,18 @@
 package nastia.somnusDreamComment.Comment.service;
 
 
-import nastia.somnusDreamComment.Comment.exception.CommentNotFound;
-import nastia.somnusDreamComment.Comment.exception.DreamNotExistsException;
-import nastia.somnusDreamComment.Comment.exception.UserHaveNoRights;
+import nastia.somnusDreamComment.Comment.exception.MyCommentException;
 import nastia.somnusDreamComment.Comment.model.CommentInView;
 import nastia.somnusDreamComment.Comment.model.CommentOutView;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public interface CommentServiceInterface {
-     Optional<CommentOutView> addComment(CommentInView commentInView, long dreamId, long authId) throws DreamNotExistsException;
+     CommentOutView addComment(CommentInView commentInView, long dreamId, long authId, String authorUsername) throws MyCommentException;
 
-     Optional<List<CommentOutView>> readCommentForPost(long dreamId) throws DreamNotExistsException;
+     List<CommentOutView> readCommentForPost(long dreamId) throws MyCommentException;
 
-     Optional<CommentOutView> editComment(long userId, long commentId, CommentInView comment) throws UserHaveNoRights, DreamNotExistsException;
+     CommentOutView editComment(long userId, long commentId, CommentInView comment) throws MyCommentException;
 
-     void deleteComment(long userId, long commentId) throws UserHaveNoRights, CommentNotFound;
+     void deleteComment(long userId, long commentId) throws MyCommentException;
 }

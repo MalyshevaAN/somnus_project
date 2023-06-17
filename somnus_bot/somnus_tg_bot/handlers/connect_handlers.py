@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery, Message
 from services.db_service import insert_new_user
 from keyboards.keyboard_utils import create_keyboard
 from lexicon.lexicon_ru import LEXICON, LEXICON_COMMANDS_FIRST, LEXICON_POSSIBLE_RESPONSE
-from services.user_service import get_id_by_email
+from services.user_service import get_user_by_email
 from states.user_states import  FSMConnectAccounts
 from aiogram import Router
 from keyboards.keyboard_commands import  set_main_menu_commands
@@ -43,7 +43,9 @@ async def command_send_mail(message: Message):
 
 @router.message(StateFilter(FSMConnectAccounts.send_email))
 async def process_send_email(message: Message, state: FSMContext):
-    id = get_id_by_email(message.text)
+    user = get_user_by_email(message.text)
+    id = user.get('id')
+    authorUsername = user.get('firstName') + " " + user.get('lastName')
     if id > 0:
         code = generate_code()
         sended = send_code(message.text, code)
@@ -51,6 +53,7 @@ async def process_send_email(message: Message, state: FSMContext):
             await message.answer(LEXICON['send_check_code'])
             await state.update_data(id=id)
             await state.update_data(code=code)
+            await state.update_data(authorUsername = authorUsername)
             await state.set_state(FSMConnectAccounts.check_code)
         else:
             await message.answer(LEXICON['mail_error'])
@@ -82,11 +85,11 @@ async def process_check_code(message: Message, state: FSMContext):
     info = await state.get_data()
     if (message.text.replace(' ', '') == info['code']):
         user_info = await state.get_data()
-        response_status = insert_new_user(int(message.from_user.id), user_info['id'])
+        response_status = insert_new_user(int(message.from_user.id), user_info['id'], user_info['authorUsername'])
         if response_status == LEXICON_POSSIBLE_RESPONSE['OK'] or response_status == LEXICON_POSSIBLE_RESPONSE['UNIQUE_VIOLATION']:
             await message.answer(LEXICON['accounts_are_connected'])
             await state.set_state(FSMConnectAccounts.connected)
-            await state.update_data(code=None, id=None)
+            await state.update_data(code=None, id=None, authorUsername=None)
             await set_main_menu_commands(bot=bot)
         elif response_status == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']:
             await message.answer(LEXICON['something_wrong_with_somnus_tg_db'])

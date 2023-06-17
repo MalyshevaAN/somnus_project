@@ -25,9 +25,9 @@ def get_random_dream() -> str|int:
 
 def add_my_dream(text: str, user_id:str) -> int:
     try:
-        user_somnus_id = get_user_somnus_id(int(user_id))
-        if user_somnus_id > 0:
-            data = {'text':text, 'authorId':user_somnus_id}
+        somnus_id, somnus_author_username = get_user_somnus_id(int(user_id))
+        if somnus_id > 0:
+            data = {'text':text, 'authorId': somnus_id, 'authorUsername': somnus_author_username}
             headers = {'content-type':'application/json'}
             response = requests.post(URL_POST, data=json.dumps(data), headers=headers)
             if (response.status_code == http.HTTPStatus.OK):

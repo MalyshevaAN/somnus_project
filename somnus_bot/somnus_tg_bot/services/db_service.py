@@ -10,9 +10,9 @@ def create_user_table():
     except OperationalError as e:
         raise OperationalError
 
-def insert_new_user(tg_id:int, somnus_id:int) -> int:
+def insert_new_user(tg_id:int, somnus_id:int, authorUsername:str) -> int:
     try:
-        insert_data(tg_id, somnus_id)
+        insert_data(tg_id, somnus_id, authorUsername)
         return LEXICON_POSSIBLE_RESPONSE['OK']
     except OperationalError as e:
         return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']
@@ -23,7 +23,7 @@ def insert_new_user(tg_id:int, somnus_id:int) -> int:
 
 def get_user_somnus_id(tg_id:int) -> int:
     try:
-        somnus_id = get_data(tg_id)
+        somnus_id, somnus_author_username = get_data(tg_id)
         return somnus_id
     except OperationalError as e:
         return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']

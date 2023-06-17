@@ -16,8 +16,9 @@ public class JwtAuthenticationDreams implements Authentication {
 
     private Long id;
     private boolean authenticated;
-    private String userName;
+    private String username;
     private String firstName;
+    private String authorUserName;
     private Set<Role> roles;
 
     @Override
@@ -30,7 +31,7 @@ public class JwtAuthenticationDreams implements Authentication {
     public Object getDetails() { return null; }
 
     @Override
-    public Object getPrincipal() { return userName; }
+    public Object getPrincipal() { return username; }
 
     @Override
     public boolean isAuthenticated() { return authenticated; }

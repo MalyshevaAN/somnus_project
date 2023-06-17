@@ -40,7 +40,7 @@ public class DreamController {
     @PostMapping("add")
     public ResponseEntity<DreamOutView>  addDream(@RequestBody DreamInView dreamInView){
         final JwtAuthenticationDreams authInfo = authService.getAuthInfo();
-        DreamOutView dream = dreamService.addDream(dreamInView, authInfo.getCredentials(), authInfo.getUserName());
+        DreamOutView dream = dreamService.addDream(dreamInView, authInfo.getCredentials(), authInfo.getAuthorUserName());
         return ResponseEntity.ok().body(dream);
     }
 

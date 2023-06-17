@@ -11,3 +11,14 @@ services:
       - 7432:5432
     expose:
       - 7432:5432
+
+  dream-db:
+    image: "postgres:13.3-alpine"
+    environment:
+      POSTGRES_DB: somnusDreams
+      POSTGRES_USER: Nastia
+      POSTGRES_PASSWORD: qwerty
+    ports:
+      - 7434:5432
+    expose:
+      - 7434:5432

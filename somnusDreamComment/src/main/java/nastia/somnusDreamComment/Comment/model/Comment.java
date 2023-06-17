@@ -23,7 +23,9 @@ public class Comment {
     private long Id;
 
 
-    private Long userId;
+    private Long authorId;
+
+    private String authorUserName;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dream_id", nullable = false)
@@ -34,10 +36,4 @@ public class Comment {
     
     @Basic
     private final LocalDateTime timeCreation = LocalDateTime.now();
-
-    public Comment(Long authorId, Dream dream, String commentText) {
-        this.userId = authorId;
-        this.dream = dream;
-        this.commentText = commentText;
-    }
 }
