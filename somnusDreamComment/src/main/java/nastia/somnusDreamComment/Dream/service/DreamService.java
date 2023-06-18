@@ -127,7 +127,7 @@ public class DreamService implements DreamServiceInterface {
         dreamOutView.setDateCreation(dream.getDateCreation());
         dreamOutView.setLikes((long) dream.getLikes().size());
         dreamOutView.setComments((long) dream.getComments().size());
-        dreamOutView.setAuthor(dream.getAuthorId());
+        dreamOutView.setAuthorId(dream.getAuthorId());
         dreamOutView.setAuthorUsername(dream.getAuthorUsername());
         return dreamOutView;
     }

@@ -32,17 +32,9 @@ public class User {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
-    private long avatarId;
+//    private long avatarId;
+    private String avatarPath;
     private Set<Role> roles = Set.of(Role.USER);
-
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
-//    private Set<Dream> dreams = new HashSet<>();
-
-
-//    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-//    @JsonIgnore
-//    private Set<Comment> comments = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany

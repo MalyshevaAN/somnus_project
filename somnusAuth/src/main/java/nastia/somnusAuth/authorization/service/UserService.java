@@ -104,22 +104,22 @@ public class UserService implements UserServiceInterface {
         return UserOutSet(mySubscribers);
     }
 
-    public UserOutView addAvatar(MultipartFile file, long userId)  throws MyException {
-        Optional<User> user = getUserById(userId);
-        if (user.isPresent()) {
-            User userWithAva = user.get();
-            try {
-                Long avatarId = avatarService.uploadAvatar(file, userId);
-                userWithAva.setAvatarId(avatarId);
-                UserOutView userWithAvaSaved = createUserOutView(userRepository.save(userWithAva));
-                userWithAvaSaved.setAvatarPath(avatarService.downloadAvatar(userId));
-                return userWithAvaSaved;
-            } catch (UploadException e){
-                throw new MyException(HttpStatus.BAD_GATEWAY, "Не удается загрузить фотографию");
-            }
-        }
-        throw new MyException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-    }
+//    public UserOutView addAvatar(MultipartFile file, long userId)  throws MyException {
+//        Optional<User> user = getUserById(userId);
+//        if (user.isPresent()) {
+//            User userWithAva = user.get();
+//            try {
+//                Long avatarId = avatarService.uploadAvatar(file, userId);
+//                userWithAva.setAvatarId(avatarId);
+//                UserOutView userWithAvaSaved = createUserOutView(userRepository.save(userWithAva));
+//                userWithAvaSaved.setAvatarPath(avatarService.downloadAvatar(userId));
+//                return userWithAvaSaved;
+//            } catch (UploadException e){
+//                throw new MyException(HttpStatus.BAD_GATEWAY, "Не удается загрузить фотографию");
+//            }
+//        }
+//        throw new MyException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+//    }
 
     private UserOutView createUserOutView(User user) {
         UserOutView newUser = new UserOutView();
@@ -128,7 +128,8 @@ public class UserService implements UserServiceInterface {
         newUser.setId(user.getId());
         newUser.setFirstName(user.getFirstName());
         newUser.setLastName(user.getLastName());
-        newUser.setAvatarPath(avatarService.downloadAvatar(user.getId()));
+//        newUser.setAvatarPath(avatarService.downloadAvatar(user.getId()));
+        newUser.setAvatarPath(user.getAvatarPath());
         return newUser;
     }
 
@@ -138,6 +139,7 @@ public class UserService implements UserServiceInterface {
         user.setPassword(applicationConfig.HashPassword(userInView.getPassword()));
         user.setFirstName(userInView.getFirstName());
         user.setLastName(userInView.getLastName());
+        user.setAvatarPath(avatarService.getRandomAvatar());
         return user;
     }
 

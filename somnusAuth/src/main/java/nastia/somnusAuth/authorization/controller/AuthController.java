@@ -21,7 +21,6 @@ public class AuthController {
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest){
         try{
             final JwtResponse token = authService.login(authRequest);
-            System.out.println(ResponseEntity.ok(token).getHeaders());
             return ResponseEntity.ok(token);
         } catch (MyException e){
             return new ResponseEntity<>(e.getStatusCode());

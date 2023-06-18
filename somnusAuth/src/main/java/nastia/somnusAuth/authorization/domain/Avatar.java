@@ -15,10 +15,8 @@ public class Avatar {
 
     @Column(nullable = false)
     private Long userId;
-    @Column(unique = true)
     private String name;
 
     private String type;
-    @Column(unique = true)
     private String imagePath;
 }

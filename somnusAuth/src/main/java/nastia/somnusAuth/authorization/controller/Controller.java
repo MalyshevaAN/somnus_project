@@ -9,7 +9,6 @@ import nastia.somnusAuth.authorization.service.UserServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import java.util.Set;
 
 @RestController
@@ -63,13 +62,13 @@ public class Controller {
         }
     }
 
-    @PostMapping("avatar")
-    public ResponseEntity<UserOutView> addAvatar(@RequestParam("userAvatar") MultipartFile file){
-        final JwtAuthentication authInfo = authService.getAuthInfo();
-        try {
-            return ResponseEntity.ok().body(userService.addAvatar(file, authInfo.getCredentials()));
-        } catch (MyException e){
-            return new ResponseEntity<>(e.getStatusCode());
-        }
-    }
+//    @PostMapping("avatar")
+//    public ResponseEntity<UserOutView> addAvatar(@RequestParam("userAvatar") MultipartFile file){
+//        final JwtAuthentication authInfo = authService.getAuthInfo();
+//        try {
+//            return ResponseEntity.ok().body(userService.addAvatar(file, authInfo.getCredentials()));
+//        } catch (MyException e){
+//            return new ResponseEntity<>(e.getStatusCode());
+//        }
+//    }
 }
