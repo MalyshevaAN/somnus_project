@@ -6,13 +6,11 @@ import nastia.somnusAuth.authorization.domain.UserOutView;
 import nastia.somnusAuth.authorization.exception.MyException;
 import nastia.somnusAuth.authorization.service.UserServiceInterface;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin
 public class ControllerTG {
 
 

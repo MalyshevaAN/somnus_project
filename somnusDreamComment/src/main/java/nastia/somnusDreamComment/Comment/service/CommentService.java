@@ -71,7 +71,7 @@ public class CommentService implements CommentServiceInterface{
         if (comment.isPresent()){
             Comment comment1 = comment.get();
             if (comment1.getAuthorId() == userId){
-                return commentRepository.delete(comment1);
+                commentRepository.delete(comment1);
             }
             throw new MyCommentException(HttpStatus.NOT_ACCEPTABLE, "Нельзя удалять чужие посты");
         }
