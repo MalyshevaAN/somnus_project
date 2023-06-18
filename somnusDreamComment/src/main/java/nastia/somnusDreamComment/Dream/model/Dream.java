@@ -26,7 +26,7 @@ public class Dream {
 
     @Basic
     @Column(name = "DateCreation")
-    private final LocalDateTime localDateTime = LocalDateTime.now();
+    private final LocalDateTime dateCreation = LocalDateTime.now();
 
 
     private Long authorId;

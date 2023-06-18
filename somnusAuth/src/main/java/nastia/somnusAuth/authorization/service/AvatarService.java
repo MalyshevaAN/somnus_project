@@ -4,7 +4,6 @@ package nastia.somnusAuth.authorization.service;
 import nastia.somnusAuth.authorization.domain.Avatar;
 import nastia.somnusAuth.authorization.exception.MyException;
 import nastia.somnusAuth.authorization.exception.UploadException;
-import nastia.somnusAuth.authorization.exception.UserHasNoAvatarException;
 import nastia.somnusAuth.authorization.repository.AvatarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -11,19 +11,15 @@ import java.util.HashSet;
 import java.util.Set;
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class DreamOutView {
 
     private Long Id;
     private String dreamText;
-    private final LocalDateTime localDateTime = LocalDateTime.now();
-
-    private Long author;
+    private LocalDateTime dateCreation;
+    private Long authorId;
     private String authorUsername;
-
-    private Set<Comment> comments = new HashSet<>();
-
-    private Set<Long> likes = new HashSet<>();
-
+    private Long comments;
+    private Long likes;
 }
