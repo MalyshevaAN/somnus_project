@@ -104,22 +104,22 @@ public class UserService implements UserServiceInterface {
         return UserOutSet(mySubscribers);
     }
 
-//    public UserOutView addAvatar(MultipartFile file, long userId)  throws MyException {
-//        Optional<User> user = getUserById(userId);
-//        if (user.isPresent()) {
-//            User userWithAva = user.get();
-//            try {
-//                Long avatarId = avatarService.uploadAvatar(file, userId);
-//                userWithAva.setAvatarId(avatarId);
-//                UserOutView userWithAvaSaved = createUserOutView(userRepository.save(userWithAva));
-//                userWithAvaSaved.setAvatarPath(avatarService.downloadAvatar(userId));
-//                return userWithAvaSaved;
-//            } catch (UploadException e){
-//                throw new MyException(HttpStatus.BAD_GATEWAY, "Не удается загрузить фотографию");
-//            }
-//        }
-//        throw new MyException(HttpStatus.NOT_FOUND, "Пользователь не найден");
-//    }
+    public UserOutView addAvatar(MultipartFile file, long userId)  throws MyException {
+        Optional<User> user = getUserById(userId);
+        if (user.isPresent()) {
+            User userWithAva = user.get();
+            try {
+                String avatarPath = avatarService.uploadAvatar(file, userId);
+                userWithAva.setAvatarPath(avatarPath);
+                UserOutView userWithAvaSaved = createUserOutView(userRepository.save(userWithAva));
+                userWithAvaSaved.setAvatarPath(avatarService.downloadAvatar(userId));
+                return userWithAvaSaved;
+            } catch (UploadException e){
+                throw new MyException(HttpStatus.BAD_GATEWAY, "Не удается загрузить фотографию");
+            }
+        }
+        throw new MyException(HttpStatus.NOT_FOUND, "Пользователь не найден");
+    }
 
     private UserOutView createUserOutView(User user) {
         UserOutView newUser = new UserOutView();

@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public interface AvatarServiceInterface {
-//    String uploadAvatar(long userId) throws UploadException;
-//    String downloadAvatar(long userId);
+    String uploadAvatar(MultipartFile file, long userId) throws UploadException;
+    String downloadAvatar(long userId);
     String getRandomAvatar();
 }
 

@@ -43,6 +43,7 @@ public class JwtProvider {
                 .claim("lastName", user.getLastName())
                 .claim("email", user.getEmail())
                 .claim("roles", user.getRoles())
+                .claim("avatarPath", user.getAvatarPath())
                 .compact();
     }
 

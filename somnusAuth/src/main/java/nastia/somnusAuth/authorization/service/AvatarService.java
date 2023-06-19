@@ -20,9 +20,9 @@ public class AvatarService implements AvatarServiceInterface{
     @Autowired
     AvatarRepository avatarRepository;
 
-    List<String> possibleAvatars = List.of("/home/nastia/javaProjects/avatars/moon.png", "/home/nastia/javaProjects/avatars/star.png");
+    List<String> possibleAvatars = List.of("/home/nastia/javaProjects/ava/moon.png", "/home/nastia/javaProjects/ava/star.png");
 
-    private final String PATH = "/home/nastia/Somnus/UserAvatars/";
+    private final String PATH = "/home/nastia/javaProjects/ava/";
 
 
     public String getRandomAvatar(){
@@ -31,26 +31,26 @@ public class AvatarService implements AvatarServiceInterface{
     }
 
 
-//    public String uploadAvatar(long userId) throws UploadException {
-////        String filename = userId + "_" + file.getOriginalFilename();
-////        String fullPath = PATH + filename;
-////        Optional<Avatar> existingAvatar = avatarRepository.findByImagePath(fullPath);
-////        if (existingAvatar.isEmpty()) {
-////            Optional<Avatar> userAvatar = avatarRepository.findByUserId(userId);
-////            Avatar avatar;
-////            avatar = userAvatar.orElseGet(Avatar::new);
-////            avatar.setUserId(userId);
-////            avatar.setImagePath(fullPath);
-////            avatar.setName(filename);
-////            avatar.setType(file.getContentType());
-////            try {
-////                file.transferTo(new File(fullPath));
-////            } catch (IOException e) {
-////                throw new UploadException();
-////            }
-////            return avatarRepository.save(avatar).getId();
-////        }
-////        throw new MyException(HttpStatus.BAD_REQUEST, "Такая фотография уже загружена");
+    public String uploadAvatar(MultipartFile file, long userId) throws UploadException {
+        String filename = userId + "_" + file.getOriginalFilename();
+        String fullPath = PATH + filename;
+        Optional<Avatar> existingAvatar = avatarRepository.findByImagePath(fullPath);
+        if (existingAvatar.isEmpty()) {
+            Optional<Avatar> userAvatar = avatarRepository.findByUserId(userId);
+            Avatar avatar;
+            avatar = userAvatar.orElseGet(Avatar::new);
+            avatar.setUserId(userId);
+            avatar.setImagePath(fullPath);
+            avatar.setName(filename);
+            avatar.setType(file.getContentType());
+            try {
+                file.transferTo(new File(fullPath));
+            } catch (IOException e) {
+                throw new UploadException();
+            }
+            return avatarRepository.save(avatar).getImagePath();
+        }
+        throw new MyException(HttpStatus.BAD_REQUEST, "Такая фотография уже загружена");
 //        String avatarPath = getAvatar();
 //        String[] components = avatarPath.split("/");
 //        String fileName = components[components.length-1];
@@ -60,11 +60,11 @@ public class AvatarService implements AvatarServiceInterface{
 //        newUserAvatar.setImagePath(avatarPath);
 //        newUserAvatar.setName(fileName);
 //        newUserAvatar.setType(fileType);
-//        return avatarRepository.save(newUserAvatar).getImagePath();
-//    }
-//
-//    public String downloadAvatar(long userId) {
-//        Optional<Avatar>  userAvatar = avatarRepository.findByUserId(userId);
-//        return userAvatar.map(Avatar::getImagePath).orElse(null);
-//    }
+//        return avatarRepository.save(newUserAvatar).getId;
+    }
+
+    public String downloadAvatar(long userId) {
+        Optional<Avatar>  userAvatar = avatarRepository.findByUserId(userId);
+        return userAvatar.map(Avatar::getImagePath).orElse(null);
+    }
 }
