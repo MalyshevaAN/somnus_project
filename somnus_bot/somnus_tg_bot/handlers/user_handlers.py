@@ -9,15 +9,16 @@ from services.image_service import get_add_dream_image
 
 
 from keyboards.keyboard_utils import create_keyboard
-from lexicon.lexicon_ru import LEXICON, LEXICON_COMMANDS, LEXICON_COMMANDS_FIRST, LEXICON_POSSIBLE_RESPONSE
+from lexicon.lexicon_ru import LEXICON, LEXICON_COMMANDS, LEXICON_COMMANDS_FIRST
 from services.image_service import get_add_dream_image
 from services.dream_service import get_random_dream, add_my_dream
 from states.user_states import FSMAddDream, FSMConnectAccounts
 from aiogram import Router, Bot
 from config_data.config import Config, load_config
 from keyboards.keyboard_commands import set_first_menu, set_main_menu_commands
-
+from exceptions import exceptions
 from keyboards.keyboard_utils import create_keyboard
+from requests.exceptions import ConnectionError
 
 
 config: Config = load_config('somnus_tg_bot/.env')
@@ -31,7 +32,7 @@ async def process_start_command(message: Message):
     await message.answer(f'Привет, {message.from_user.first_name}!' + " " + LEXICON_COMMANDS_FIRST['/start'])
     await set_first_menu(bot=bot)
 
-@router.message(CommandStart(), ~StateFilter(FSMConnectAccounts.connected))
+@router.message(CommandStart(), StateFilter(FSMConnectAccounts.connected))
 async def process_start_command(message: Message):
     await message.answer(f'Привет, {message.from_user.first_name}!' + " " + LEXICON_COMMANDS['/start'])
     await set_main_menu_commands(bot=bot)
@@ -58,17 +59,17 @@ async def process_add_command(message: Message, state: FSMContext):
 
 @router.message(StateFilter(FSMAddDream.add_dream), IsTextMessage())
 async def process_add_dream(message:Message, state: FSMContext):
-    response = add_my_dream(message.text, message.from_user.id)
-    if response == LEXICON_POSSIBLE_RESPONSE['OK']:
+    try:
+        add_my_dream(message.text, message.from_user.id)
         await message.answer(LEXICON['dream_is_added'], reply_markup=create_keyboard('add_one_more', 'add_no_more'))
         await state.set_state(FSMAddDream.add_one_more)
-    elif response == LEXICON_POSSIBLE_RESPONSE['BAD_REQUEST']:
+    except exceptions.DreamIsNotCreated:
         await message.answer(LEXICON['bad_request'])
         await state.clear()
-    elif response == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR']:
+    except exceptions.ConnectionErrorMicro:
         await message.answer(LEXICON['something_wrong_with_dream_service'])
         await state.clear()
-    elif response == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']:
+    except ConnectionError:
         await message.answer(LEXICON['something_wrong_with_somnus_tg_db'])
         await state.clear()
 
@@ -101,12 +102,12 @@ async def process_add_dream_incorrect(message: Message, state: FSMContext):
 
 @router.message(Command(commands='read'), StateFilter(FSMConnectAccounts.connected))
 async def process_add_command(message: Message):
-    dream = get_random_dream()
-    if isinstance(dream, str):
+    try:
+        dream = get_random_dream()
         await message.answer(LEXICON_COMMANDS['/read'] + dream)
-    elif dream == LEXICON_POSSIBLE_RESPONSE['NOT_FOUND']:
+    except exceptions.NotFound:
         await message.answer(LEXICON['no_dreams'])
-    elif dream == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR']:
+    except ConnectionError:
         await message.answer(LEXICON['something_wrong_with_dream_service'])
 
 @router.message(Command(commands='read'), ~StateFilter(FSMConnectAccounts.connected))

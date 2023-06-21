@@ -1,9 +1,8 @@
 from database.database import create_table, insert_data, get_data, get_all_tg_users
-from lexicon.lexicon_ru import LEXICON_POSSIBLE_RESPONSE
 from psycopg2 import OperationalError
 from psycopg2.errors import UniqueViolation
 import logging
-
+from exceptions import exceptions
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -24,14 +23,13 @@ def insert_new_user(tg_id:int, somnus_id:int, authorUsername:str) -> int:
     try:
         insert_data(tg_id, somnus_id, authorUsername)
         logger.info("user is created")
-        return LEXICON_POSSIBLE_RESPONSE['OK']
     except OperationalError as e:
         logger.error("connection error")
-        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']
+        raise OperationalError
 
     except UniqueViolation as e:
         logger.error("unique user violation")
-        return LEXICON_POSSIBLE_RESPONSE['UNIQUE_VIOLATION']
+        raise UniqueViolation
 
 
 def get_user_somnus(tg_id:int):
@@ -41,7 +39,7 @@ def get_user_somnus(tg_id:int):
         return (int(somnus_id), somnus_author_username)
     except OperationalError as e:
         logger.error("connection error")
-        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']
+        raise OperationalError
 
 def get_all_users() -> list[int]|int:
 
@@ -51,4 +49,4 @@ def get_all_users() -> list[int]|int:
         return all_users_ids
     except OperationalError as e:
         logger.error("connection error")
-        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']
+        raise OperationalError

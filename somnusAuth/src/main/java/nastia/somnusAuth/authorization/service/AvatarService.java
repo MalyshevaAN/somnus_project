@@ -9,24 +9,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AvatarService implements AvatarServiceInterface{
+public class AvatarService implements AvatarServiceInterface {
 
     @Autowired
     AvatarRepository avatarRepository;
 
-    List<String> possibleAvatars = List.of("/home/nastia/javaProjects/ava/moon.png", "/home/nastia/javaProjects/ava/star.png");
+    List<String> possibleAvatars = List.of("https://ltdfoto.ru/images/2023/06/21/ava3.jpg", "https://ltdfoto.ru/images/2023/06/21/ava5.jpg", "https://ltdfoto.ru/images/2023/06/21/ava2.jpg");
 
     private final String PATH = "/home/nastia/javaProjects/ava/";
 
 
-    public String getRandomAvatar(){
-        int randomAvatar = (int) (Math.random()*(possibleAvatars.size()));
+    public String getRandomAvatar() {
+        int randomAvatar = (int) (Math.random() * (possibleAvatars.size()));
         return possibleAvatars.get(randomAvatar);
     }
 
@@ -64,7 +65,7 @@ public class AvatarService implements AvatarServiceInterface{
     }
 
     public String downloadAvatar(long userId) {
-        Optional<Avatar>  userAvatar = avatarRepository.findByUserId(userId);
+        Optional<Avatar> userAvatar = avatarRepository.findByUserId(userId);
         return userAvatar.map(Avatar::getImagePath).orElse(null);
     }
 }

@@ -10,6 +10,7 @@ public interface AuthServiceInterface {
     JwtResponse login(@NonNull JwtRequest authRequest) throws MyException;
 
     JwtAuthentication getAuthInfo();
+
     UserOutView registerUser(UserInView userIn) throws MyException;
 
 }

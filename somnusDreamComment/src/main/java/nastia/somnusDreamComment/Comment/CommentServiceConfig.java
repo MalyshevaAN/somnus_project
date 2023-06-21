@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CommentServiceConfig {
     @Bean
-    public CommentServiceInterface getService(){
+    public CommentServiceInterface getService() {
         return new CommentService();
     }
 }

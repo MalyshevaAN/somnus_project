@@ -8,11 +8,11 @@ import nastia.somnusDreamComment.Comment.model.CommentOutView;
 import java.util.List;
 
 public interface CommentServiceInterface {
-     CommentOutView addComment(CommentInView commentInView, long dreamId, long authId, String authorUsername) throws MyCommentException;
+    CommentOutView addComment(CommentInView commentInView, long dreamId, long authId, String authorUsername) throws MyCommentException;
 
-     List<CommentOutView> readCommentForPost(long dreamId) throws MyCommentException;
+    List<CommentOutView> readCommentForPost(long dreamId) throws MyCommentException;
 
-     CommentOutView editComment(long userId, long commentId, CommentInView comment) throws MyCommentException;
+    CommentOutView editComment(long userId, long commentId, CommentInView comment) throws MyCommentException;
 
-     void deleteComment(long userId, long commentId) throws MyCommentException;
+    void deleteComment(long userId, long commentId) throws MyCommentException;
 }

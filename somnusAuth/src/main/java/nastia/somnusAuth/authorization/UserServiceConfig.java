@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class UserServiceConfig {
     @Bean
-    public UserServiceInterface getUserService(){
+    public UserServiceInterface getUserService() {
         return new UserService();
     }
 }

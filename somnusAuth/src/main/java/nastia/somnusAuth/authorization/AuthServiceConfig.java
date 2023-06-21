@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AuthServiceConfig {
     @Bean
-    public AuthServiceInterface getAuthService(){
+    public AuthServiceInterface getAuthService() {
         return new AuthService();
     }
 

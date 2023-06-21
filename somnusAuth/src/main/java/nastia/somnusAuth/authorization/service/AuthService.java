@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-public class AuthService implements AuthServiceInterface{
+public class AuthService implements AuthServiceInterface {
 
     @Autowired
     UserService userService;

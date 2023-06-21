@@ -15,16 +15,17 @@ public class ControllerTG {
 
 
     UserServiceInterface userService;
+
     public ControllerTG(UserServiceInterface userService) {
         this.userService = userService;
     }
 
     @PostMapping("idByEmail")
-    public ResponseEntity<UserOutView> getUserByEmail(@RequestBody UserInViewTG userInViewTG){
+    public ResponseEntity<UserOutView> getUserByEmail(@RequestBody UserInViewTG userInViewTG) {
         try {
             UserOutView user = userService.getByEmailTG(userInViewTG);
             return ResponseEntity.ok().body(user);
-        } catch (MyException e){
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }

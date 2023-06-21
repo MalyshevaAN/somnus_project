@@ -22,27 +22,27 @@ public class JwtCheck {
 
     public JwtCheck(
             @Value("${jwt.secret.access}") String jwtAccessSecret
-    ){
+    ) {
         this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtAccessSecret));
     }
 
-    public boolean validateAccessToken(@NonNull String accessToken){
+    public boolean validateAccessToken(@NonNull String accessToken) {
         return validateToken(accessToken, jwtAccessSecret);
     }
 
 
-    public boolean validateToken(@NonNull String token, @NonNull Key secret){
+    public boolean validateToken(@NonNull String token, @NonNull Key secret) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(secret)
                     .build()
                     .parseClaimsJws(token);
             return true;
-        }catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             log.error("Token expired", e);
-        }catch (UnsupportedJwtException e){
+        } catch (UnsupportedJwtException e) {
             log.error("Unsupported jwt", e);
-        }catch (MalformedJwtException mjEx) {
+        } catch (MalformedJwtException mjEx) {
             log.error("Malformed jwt", mjEx);
         } catch (SignatureException sEx) {
             log.error("Invalid signature", sEx);
@@ -51,11 +51,12 @@ public class JwtCheck {
         }
         return false;
     }
-    public Claims getAccessClaims(@NonNull String token){
+
+    public Claims getAccessClaims(@NonNull String token) {
         return getClaims(token, jwtAccessSecret);
     }
 
-    private Claims getClaims(@NonNull String token, @NonNull Key secret){
+    private Claims getClaims(@NonNull String token, @NonNull Key secret) {
         return Jwts.parserBuilder()
                 .setSigningKey(secret)
                 .build()

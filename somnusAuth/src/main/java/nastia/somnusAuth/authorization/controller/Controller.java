@@ -23,53 +23,52 @@ public class Controller {
     private final UserServiceInterface userService;
 
 
-
     @PutMapping("follow/{userId}")
-    public ResponseEntity<UserOutView> addFollow(@PathVariable long userId){
+    public ResponseEntity<UserOutView> addFollow(@PathVariable long userId) {
         final JwtAuthentication authInfo = authService.getAuthInfo();
-        try{
-           return ResponseEntity.ok().body(userService.saveFollow(authInfo.getCredentials(), userId));
-        } catch (MyException e){
+        try {
+            return ResponseEntity.ok().body(userService.saveFollow(authInfo.getCredentials(), userId));
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @PutMapping("unfollow/{userId}")
-    public ResponseEntity<UserOutView> removeFollow(@PathVariable long userId){
+    public ResponseEntity<UserOutView> removeFollow(@PathVariable long userId) {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         try {
             return ResponseEntity.ok().body(userService.deleteFollow(authInfo.getCredentials(), userId));
-        } catch (MyException e){
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @GetMapping("subscriptions")
-    public ResponseEntity<Set<UserOutView>> getMySubscriptions(){
+    public ResponseEntity<Set<UserOutView>> getMySubscriptions() {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         try {
             return ResponseEntity.ok().body(userService.getSubscriptions(authInfo.getCredentials()));
-        } catch (MyException e){
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @GetMapping("subscribers")
-    public ResponseEntity<Set<UserOutView>> getMySubscribers(){
+    public ResponseEntity<Set<UserOutView>> getMySubscribers() {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         try {
             return ResponseEntity.ok().body(userService.getSubscribers(authInfo.getCredentials()));
-        } catch (MyException e){
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @PostMapping("avatar")
-    public ResponseEntity<UserOutView> addAvatar(@RequestParam("userAvatar") MultipartFile file){
+    public ResponseEntity<UserOutView> addAvatar(@RequestParam("userAvatar") MultipartFile file) {
         final JwtAuthentication authInfo = authService.getAuthInfo();
         try {
             return ResponseEntity.ok().body(userService.addAvatar(file, authInfo.getCredentials()));
-        } catch (MyException e){
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }

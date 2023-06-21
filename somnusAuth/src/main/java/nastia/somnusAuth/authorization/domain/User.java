@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-
 import java.util.*;
 
 @Getter
@@ -32,7 +31,7 @@ public class User {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
-//    private long avatarId;
+    //    private long avatarId;
     private String avatarPath;
     private Set<Role> roles = Set.of(Role.USER);
 
@@ -41,7 +40,7 @@ public class User {
     @JoinTable(
             name = "user_subscriptions",
             joinColumns = {@JoinColumn(name = "channel_id")},
-            inverseJoinColumns = {@JoinColumn(name="subscriber_id")}
+            inverseJoinColumns = {@JoinColumn(name = "subscriber_id")}
     )
     private Set<User> subscribers = new HashSet<>();
 
@@ -51,16 +50,16 @@ public class User {
     @JoinTable(
             name = "user_subscriptions",
             joinColumns = {@JoinColumn(name = "subscriber_id")},
-            inverseJoinColumns = {@JoinColumn(name="channel_id")}
+            inverseJoinColumns = {@JoinColumn(name = "channel_id")}
     )
     private Set<User> subscribtions = new HashSet<>();
 
-    public void addSubscription(User subscription){
+    public void addSubscription(User subscription) {
         this.subscribtions.add(subscription);
     }
 
-    public void deleteSubscription(User subscription){
-        if (this.subscribtions.contains(subscription)){
+    public void deleteSubscription(User subscription) {
+        if (this.subscribtions.contains(subscription)) {
             this.subscribtions.remove(subscription);
         }
     }

@@ -5,7 +5,6 @@ from aiogram import Bot, Dispatcher
 from config_data.config import load_config, Config
 from handlers import other_handlers, user_handlers, schedule_handlers, connect_handlers
 from aiogram.fsm.storage.redis import RedisStorage, Redis
-from aiogram.fsm.storage.memory import MemoryStorage
 from keyboards.keyboard_commands import set_first_menu
 from psycopg2 import OperationalError
 from services.db_service import create_user_table
@@ -34,8 +33,7 @@ async def main():
     bot:Bot = Bot(config.tg_bot.token, parse_mode='HTML')
     redis: Redis = Redis(host=config.redis.host)
     storage: RedisStorage = RedisStorage(redis=redis)
-    storage2: MemoryStorage = MemoryStorage()
-    dp: Dispatcher = Dispatcher(storage=storage2)
+    dp: Dispatcher = Dispatcher(storage=storage)
 
     asyncio.create_task(scheduler())
     await set_first_menu(bot=bot)

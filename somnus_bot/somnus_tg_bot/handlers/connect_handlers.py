@@ -6,7 +6,7 @@ from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 from services.db_service import insert_new_user
 from keyboards.keyboard_utils import create_keyboard
-from lexicon.lexicon_ru import LEXICON, LEXICON_COMMANDS_FIRST, LEXICON_POSSIBLE_RESPONSE
+from lexicon.lexicon_ru import LEXICON, LEXICON_COMMANDS_FIRST
 from services.user_service import get_user_by_email
 from states.user_states import  FSMConnectAccounts
 from aiogram import Router
@@ -17,6 +17,11 @@ from config_data.config import Config, load_config
 from keyboards.keyboard_utils import create_keyboard
 from filters.commands_filter import CommandFilter
 import logging
+from requests.exceptions import ConnectionError
+import smtplib
+from psycopg2 import OperationalError
+from psycopg2.errors import UniqueViolation
+from exceptions import exceptions
 
 
 logger = logging.getLogger(__name__)
@@ -47,28 +52,27 @@ async def command_send_mail(message: Message):
 
 @router.message(StateFilter(FSMConnectAccounts.send_email))
 async def process_send_email(message: Message, state: FSMContext):
-    user = get_user_by_email(message.text)
-    print(user)
-    logger.info(user)
-    if user == LEXICON_POSSIBLE_RESPONSE['NOT_FOUND'] :
-        await message.answer(LEXICON['email_not_exists'], reply_markup=create_keyboard('email_again', 'cancel_connection'))
-    elif user == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR'] or user is None:
-        await message.answer(LEXICON['something_went_wrong'])
-        await state.clear()
-    id = user.get('id')
-    authorUsername = user['firstName'] + " " + user['lastName']
-    if id > 0:
+    try:
+        user = get_user_by_email(message.text)
+        id = user.get('id')
+        authorUsername = user['firstName'] + " " + user['lastName']
         code = generate_code()
-        sended = send_code(message.text, code)
-        if sended == True:
+        try:
+            send_code(message.text, code)
             await message.answer(LEXICON['send_check_code'])
             await state.update_data(id=id)
             await state.update_data(code=code)
             await state.update_data(authorUsername = authorUsername)
             await state.set_state(FSMConnectAccounts.check_code)
-        else:
+        except smtplib.SMTPConnectError:
             await message.answer(LEXICON['mail_error'])
             await state.clear()
+    except ConnectionError as e:
+          await message.answer(LEXICON['something_went_wrong'])
+          await state.clear()
+    except exceptions.NotFound:
+        await message.answer(LEXICON['email_not_exists'], reply_markup=create_keyboard('email_again', 'cancel_connection'))
+
 
 
 @router.callback_query(StateFilter(FSMConnectAccounts.send_email), Text(text='email_again'))
@@ -90,15 +94,20 @@ async def process_check_code(message: Message, state: FSMContext):
     info = await state.get_data()
     if (message.text.replace(' ', '') == info['code']):
         user_info = await state.get_data()
-        response_status = insert_new_user(int(message.from_user.id), int(user_info['id']), user_info['authorUsername'])
-        if response_status == LEXICON_POSSIBLE_RESPONSE['OK'] or response_status == LEXICON_POSSIBLE_RESPONSE['UNIQUE_VIOLATION']:
+        try:
+            insert_new_user(int(message.from_user.id), int(user_info['id']), user_info['authorUsername'])
             await message.answer(LEXICON['accounts_are_connected'])
             await state.set_state(FSMConnectAccounts.connected)
             await state.update_data(code=None, id=None, authorUsername=None)
             await set_main_menu_commands(bot=bot)
-        elif response_status == LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']:
+        except OperationalError:
             await message.answer(LEXICON['something_wrong_with_somnus_tg_db'])
             await state.clear()
+        except UniqueViolation:
+            await message.answer(LEXICON['accounts_are_connected'])
+            await state.set_state(FSMConnectAccounts.connected)
+            await state.update_data(code=None, id=None, authorUsername=None)
+            await set_main_menu_commands(bot=bot)
 
 
     else:

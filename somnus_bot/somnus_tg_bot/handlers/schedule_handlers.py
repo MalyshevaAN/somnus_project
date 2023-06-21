@@ -7,6 +7,7 @@ from lexicon.lexicon_ru import LEXICON
 from keyboards.keyboard_utils import create_keyboard
 import aioschedule
 import logging
+from requests.exceptions import ConnectionError
 
 router: Router = Router()
 
@@ -24,11 +25,11 @@ bot: Bot = Bot(config.tg_bot.token)
 @router.message()
 async def send_good_morning():
     photo = get_good_morning_image()
-    all_users = get_all_users()
-    if isinstance(all_users, list):
+    try:
+        all_users = get_all_users()
         for user in all_users:
             await bot.send_photo(chat_id=user, photo=photo, caption=LEXICON['good_morning'], reply_markup=create_keyboard('yes','no'))
-    else:
+    except ConnectionError:
         logger.error("cannot connect to somnustg db")
 
 

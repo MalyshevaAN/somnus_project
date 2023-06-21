@@ -12,13 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CommentService implements CommentServiceInterface{
+public class CommentService implements CommentServiceInterface {
 
     @Autowired
     CommentRepository commentRepository;
@@ -30,7 +29,7 @@ public class CommentService implements CommentServiceInterface{
 
         Optional<Dream> dream = dreamService.getDreamById(dreamId);
 
-        if (dream.isEmpty()){
+        if (dream.isEmpty()) {
             throw new MyCommentException(HttpStatus.NOT_FOUND, "Такой сон не найден");
         }
 
@@ -44,7 +43,7 @@ public class CommentService implements CommentServiceInterface{
     public List<CommentOutView> readCommentForPost(long dreamId) throws MyCommentException {
         Optional<Dream> dream = dreamService.getDreamById(dreamId);
 
-        if (dream.isEmpty()){
+        if (dream.isEmpty()) {
             throw new MyCommentException(HttpStatus.NOT_FOUND, "Такой сон не найден");
         }
         List<Comment> comments = commentRepository.findByDreamId(dreamId);
@@ -55,9 +54,9 @@ public class CommentService implements CommentServiceInterface{
 
     public CommentOutView editComment(long userId, long commentId, CommentInView comment) throws MyCommentException {
         Optional<Comment> oldComment = commentRepository.findById(commentId);
-        if (oldComment.isPresent()){
+        if (oldComment.isPresent()) {
             Comment old = oldComment.get();
-            if (old.getAuthorId() == userId){
+            if (old.getAuthorId() == userId) {
                 old.setCommentText(comment.getCommentText());
                 return createCommentOutView(commentRepository.save(old));
             }
@@ -68,9 +67,9 @@ public class CommentService implements CommentServiceInterface{
 
     public void deleteComment(long userId, long commentId) throws MyCommentException {
         Optional<Comment> comment = commentRepository.findById(commentId);
-        if (comment.isPresent()){
+        if (comment.isPresent()) {
             Comment comment1 = comment.get();
-            if (comment1.getAuthorId() == userId){
+            if (comment1.getAuthorId() == userId) {
                 commentRepository.delete(comment1);
             }
             throw new MyCommentException(HttpStatus.NOT_ACCEPTABLE, "Нельзя удалять чужие посты");
@@ -78,7 +77,7 @@ public class CommentService implements CommentServiceInterface{
         throw new MyCommentException(HttpStatus.NOT_FOUND, "Комментарий не найден");
     }
 
-    private CommentOutView createCommentOutView(Comment comment){
+    private CommentOutView createCommentOutView(Comment comment) {
         CommentOutView commentOutView = new CommentOutView();
         commentOutView.setCommentText(comment.getCommentText());
         commentOutView.setId(comment.getId());
@@ -87,7 +86,7 @@ public class CommentService implements CommentServiceInterface{
         return commentOutView;
     }
 
-    private Comment createCommentView(CommentInView commentIn, long authorId, Dream dream, String authorUserName){
+    private Comment createCommentView(CommentInView commentIn, long authorId, Dream dream, String authorUserName) {
         Comment comment = new Comment();
         comment.setAuthorId(authorId);
         comment.setCommentText(commentIn.getCommentText());
@@ -95,7 +94,8 @@ public class CommentService implements CommentServiceInterface{
         comment.setDream(dream);
         return comment;
     }
-    private List<CommentOutView> CommentOutList(List<Comment> comments){
+
+    private List<CommentOutView> CommentOutList(List<Comment> comments) {
         return comments.stream().map(this::createCommentOutView).collect(Collectors.toList());
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.http.HttpMethod;
 public class ProxyConfig {
 
     @Bean
-    RouteLocator customRouteLocator(RouteLocatorBuilder builder){
+    RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("user_route",
                         route -> route.path("/user/**")

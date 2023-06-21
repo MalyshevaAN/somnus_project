@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class JwtUtils {
 
-    public static JwtAuthenticationDreams generate(Claims claims){
+    public static JwtAuthenticationDreams generate(Claims claims) {
         final JwtAuthenticationDreams jwtInfoToken = new JwtAuthenticationDreams();
         jwtInfoToken.setId(claims.get("id", Long.class));
         jwtInfoToken.setRoles(getRoles(claims));
@@ -20,7 +20,7 @@ public class JwtUtils {
         return jwtInfoToken;
     }
 
-    private static Set<Role> getRoles(Claims claims){
+    private static Set<Role> getRoles(Claims claims) {
         final List<String> roles = claims.get("roles", List.class);
         return roles.stream().map(Role::valueOf).collect(Collectors.toSet());
     }

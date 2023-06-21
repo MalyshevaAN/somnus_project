@@ -18,21 +18,21 @@ public class AuthController {
     private final AuthServiceInterface authService;
 
     @PostMapping(value = "login", produces = "application/json")
-    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest){
-        try{
+    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) {
+        try {
             final JwtResponse token = authService.login(authRequest);
             return ResponseEntity.ok(token);
-        } catch (MyException e){
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @PostMapping(value = "register", produces = "application/json")
-    public ResponseEntity<UserOutView>  registerUser(@RequestBody UserInView userIn) throws MyException {
+    public ResponseEntity<UserOutView> registerUser(@RequestBody UserInView userIn) throws MyException {
         try {
             UserOutView newUser = authService.registerUser(userIn);
             return ResponseEntity.ok().body(newUser);
-        } catch (MyException e){
+        } catch (MyException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }

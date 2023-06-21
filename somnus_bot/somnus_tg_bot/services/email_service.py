@@ -36,10 +36,9 @@ def send_code(recieiver_email:str, code: str) -> bool:
         smtp.login(user, password)
         smtp.sendmail(user, to, body.encode('utf-8'))
         logger.info("message is send")
-        return True
     except smtplib.SMTPException as err:
 
         logger.error("email error")
-        return False
+        raise smtplib.SMTPException
     finally:
         smtp.quit()

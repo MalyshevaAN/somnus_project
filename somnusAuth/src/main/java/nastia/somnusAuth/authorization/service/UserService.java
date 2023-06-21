@@ -41,14 +41,14 @@ public class UserService implements UserServiceInterface {
 
     public User getByEmail(@NonNull String email) throws MyException {
         User user = userRepository.findByEmail(email);
-        if (user != null){
-            return user ;
+        if (user != null) {
+            return user;
         }
         throw new MyException(HttpStatus.NOT_FOUND, "Пользователь с такой почтой не найден");
     }
 
 
-    public UserOutView addUser(UserInView userIn) throws MyException{
+    public UserOutView addUser(UserInView userIn) throws MyException {
         if (userRepository.existsByEmail(userIn.getEmail().toLowerCase())) {
             throw new MyException(HttpStatus.CONFLICT, "Пользователь с такой почтой уже зарегистрирован");
         }
@@ -104,7 +104,7 @@ public class UserService implements UserServiceInterface {
         return UserOutSet(mySubscribers);
     }
 
-    public UserOutView addAvatar(MultipartFile file, long userId)  throws MyException {
+    public UserOutView addAvatar(MultipartFile file, long userId) throws MyException {
         Optional<User> user = getUserById(userId);
         if (user.isPresent()) {
             User userWithAva = user.get();
@@ -114,7 +114,7 @@ public class UserService implements UserServiceInterface {
                 UserOutView userWithAvaSaved = createUserOutView(userRepository.save(userWithAva));
                 userWithAvaSaved.setAvatarPath(avatarService.downloadAvatar(userId));
                 return userWithAvaSaved;
-            } catch (UploadException e){
+            } catch (UploadException e) {
                 throw new MyException(HttpStatus.BAD_GATEWAY, "Не удается загрузить фотографию");
             }
         }

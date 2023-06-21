@@ -21,7 +21,8 @@ public class CommentController {
 
 
     CommentServiceInterface commentService;
-    public CommentController(CommentServiceInterface commentService){
+
+    public CommentController(CommentServiceInterface commentService) {
         this.commentService = commentService;
     }
 
@@ -29,45 +30,45 @@ public class CommentController {
     AuthCheckService authService;
 
     @PostMapping("add/{dreamId}")
-    public ResponseEntity<CommentOutView> addComment(@RequestBody CommentInView comment, @PathVariable long dreamId){
+    public ResponseEntity<CommentOutView> addComment(@RequestBody CommentInView comment, @PathVariable long dreamId) {
         final JwtAuthenticationDreams authInfo = authService.getAuthInfo();
         try {
             CommentOutView newComment = commentService.addComment(comment, dreamId, authInfo.getCredentials(), authInfo.getAuthorUserName());
             return ResponseEntity.ok(newComment);
-        } catch (MyCommentException e){
+        } catch (MyCommentException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
 
     }
 
     @GetMapping("read/{dreamId}")
-    public ResponseEntity<List<CommentOutView>> readComment(@PathVariable long dreamId){
+    public ResponseEntity<List<CommentOutView>> readComment(@PathVariable long dreamId) {
         try {
             List<CommentOutView> dreamComments = commentService.readCommentForPost(dreamId);
             return ResponseEntity.ok().body(dreamComments);
-        }catch (MyCommentException e){
+        } catch (MyCommentException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @PutMapping("edit/{commentId}")
-    public ResponseEntity<CommentOutView> editComment(@PathVariable long commentId, @RequestBody CommentInView comment){
+    public ResponseEntity<CommentOutView> editComment(@PathVariable long commentId, @RequestBody CommentInView comment) {
         final JwtAuthenticationDreams authInfo = authService.getAuthInfo();
         try {
-            CommentOutView commentUpdated  = commentService.editComment(authInfo.getCredentials(), commentId, comment);
+            CommentOutView commentUpdated = commentService.editComment(authInfo.getCredentials(), commentId, comment);
             return ResponseEntity.ok().body(commentUpdated);
-        } catch(MyCommentException e){
+        } catch (MyCommentException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }
 
     @DeleteMapping("delete/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable long commentId){
+    public ResponseEntity<String> deleteComment(@PathVariable long commentId) {
         final JwtAuthenticationDreams authInfo = authService.getAuthInfo();
         try {
             commentService.deleteComment(authInfo.getCredentials(), commentId);
             return new ResponseEntity<>(HttpStatus.OK);
-        }catch (MyCommentException e){
+        } catch (MyCommentException e) {
             return new ResponseEntity<>(e.getStatusCode());
         }
     }

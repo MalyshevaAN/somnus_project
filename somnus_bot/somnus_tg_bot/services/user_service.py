@@ -3,9 +3,8 @@ import json
 from requests.exceptions import ConnectionError
 import http
 from config_data.config import load_config, Config
-from lexicon.lexicon_ru import LEXICON_POSSIBLE_RESPONSE
 import logging
-
+from exceptions import exceptions
 config: Config = load_config('somnus_tg_bot/.env')
 
 URL = config.connections.email_endpoint
@@ -31,7 +30,7 @@ def get_user_by_email(email:str):
 
         elif (response.status_code == http.HTTPStatus.NOT_FOUND):
             logger.info("Пользователь не найден")
-            return LEXICON_POSSIBLE_RESPONSE['NOT_FOUND']
+            raise exceptions.NotFound
     except ConnectionError as e:
         logger.error("Не удается достать данные о пользователе")
-        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR']
+        raise ConnectionError

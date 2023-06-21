@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nastia.somnusDreamComment.Comment.model.Comment;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,5 +21,5 @@ public class DreamOutView {
     private Long authorId;
     private String authorUsername;
     private Long comments;
-    private Long likes;
+    private Set<Long> likes = new HashSet<>();
 }

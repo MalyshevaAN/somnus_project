@@ -1,11 +1,10 @@
 import requests, json
-import dotenv, os
 import http
 from requests.exceptions import ConnectionError
 from services.db_service import get_user_somnus
-from lexicon.lexicon_ru import LEXICON_POSSIBLE_RESPONSE
 from config_data.config import Config, load_config
 import logging
+from exceptions import exceptions
 
 
 logger = logging.getLogger(__name__)
@@ -28,11 +27,11 @@ def get_random_dream() -> str|int:
             return response.json()['dreamText']
 
         elif (response.status_code == http.HTTPStatus.NOT_FOUND):
-            return LEXICON_POSSIBLE_RESPONSE['NOT_FOUND']
+            raise exceptions.NotFound
         logger.info("connection to dream db is okay")
     except ConnectionError as e:
         logger.info("connection error")
-        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR']
+        raise ConnectionError
 
 def add_my_dream(text: str, user_id:str) -> int:
     try:
@@ -43,16 +42,15 @@ def add_my_dream(text: str, user_id:str) -> int:
             response = requests.post(URL_POST, data=json.dumps(data), headers=headers)
             if (response.status_code == http.HTTPStatus.OK):
                 logger.info("dream is added")
-                return LEXICON_POSSIBLE_RESPONSE['OK']
             if (response.status_code == http.HTTPStatus.BAD_REQUEST | response.status_code == http.HTTPStatus.UNAUTHORIZED):
                 logger.info("can not create dream")
-                return LEXICON_POSSIBLE_RESPONSE['BAD_REQUEST']
+                raise exceptions.DreamIsNotCreated
         else:
             logger.info("connection error")
-            return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR']
+            raise exceptions.ConnectionErrorMicro
 
     except ConnectionError as e:
         logger.info("connection error tg")
-        return LEXICON_POSSIBLE_RESPONSE['CONNECTION_ERROR_TG']
+        raise ConnectionError
 
 

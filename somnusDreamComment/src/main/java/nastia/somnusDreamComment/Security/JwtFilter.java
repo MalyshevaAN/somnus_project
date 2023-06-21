@@ -1,6 +1,5 @@
 package nastia.somnusDreamComment.Security;
 
-import com.ctc.wstx.util.StringUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,7 +28,7 @@ public class JwtFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         final String token = getTokenFromRequest((HttpServletRequest) request);
-        if (token != null && jwtCheck.validateAccessToken(token)){
+        if (token != null && jwtCheck.validateAccessToken(token)) {
             final Claims claims = jwtCheck.getAccessClaims(token);
             final JwtAuthenticationDreams jwtInfoToken = JwtUtils.generate(claims);
             jwtInfoToken.setAuthenticated(true);
@@ -38,9 +37,9 @@ public class JwtFilter extends GenericFilterBean {
         chain.doFilter(request, response);
     }
 
-    private String getTokenFromRequest(HttpServletRequest request){
+    private String getTokenFromRequest(HttpServletRequest request) {
         final String bearer = request.getHeader(AUTHORIZATION);
-        if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")){
+        if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
             return bearer.substring(7);
         }
         return null;

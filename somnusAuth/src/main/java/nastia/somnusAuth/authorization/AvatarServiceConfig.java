@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AvatarServiceConfig {
     @Bean
-    public AvatarServiceInterface getAvatarService(){
+    public AvatarServiceInterface getAvatarService() {
         return new AvatarService();
     }
 }

@@ -27,5 +27,6 @@ public interface UserServiceInterface {
 
     Set<UserOutView> getSubscriptions(long userId) throws MyException;
     Set<UserOutView> getSubscribers(long userId);
+
     UserOutView addAvatar(MultipartFile file, long userId) throws MyException;
 }
